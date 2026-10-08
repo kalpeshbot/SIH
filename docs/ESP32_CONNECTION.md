@@ -68,9 +68,32 @@ Called every `HEARTBEAT_INTERVAL_MS` (default: 15 seconds). Updates `last_seen` 
 }
 ```
 
-**Timestamp:** Omitted intentionally. The backend falls back to server-side UTC (`datetime.now(timezone.utc)`). This removes the need for an RTC module on the ESP32 prototype.
+### 2.4 Machine Node IIS3DWB Feature Ingestion (Phase 14)
+`POST /api/readings`
 
-**Side effects:** Each successful reading automatically updates the device's `last_seen` timestamp in the database.
+The Machine Node (`MN-LATHE-01`) transmits compact feature windows computed over 256 physical samples rather than high-rate raw data:
+
+```json
+{
+  "session_id": "SESS-ESP32",
+  "device_id": "MN-LATHE-01",
+  "sensor_type": "VIBRATION_RMS",
+  "value": 0.3842,
+  "unit": "g",
+  "status": "NORMAL"
+}
+```
+
+Supported feature sensor types:
+- `VIBRATION_RMS`: Vector Root Mean Square amplitude ($g$)
+- `VIBRATION_PEAK`: Maximum absolute amplitude ($g$)
+- `VIBRATION_CREST_FACTOR`: Peak-to-RMS ratio
+- `VIBRATION_BAND_LOW`: Low-frequency energy (20–200 Hz)
+
+**Timestamp:** Omitted or provided as ISO-8601. The backend falls back to server-side UTC (`datetime.now(timezone.utc)`).
+
+**Side effects:** Each successful reading automatically updates the device's `last_seen` timestamp in the database and triggers alert engine evaluation.
+
 
 ---
 

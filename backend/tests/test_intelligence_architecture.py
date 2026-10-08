@@ -371,3 +371,55 @@ def test_machine_baseline_upsert(client: TestClient):
     assert update_resp.status_code == 201
     assert update_resp.json()["baseline_value"] == 0.28
     assert update_resp.json()["sample_count"] == 250
+
+
+# -------------------------------------------------------------
+# Phase 14: Machine Node Feature Telemetry Ingestion Tests
+# -------------------------------------------------------------
+
+def test_machine_node_feature_telemetry_ingestion(client: TestClient):
+    """Verify backend accepts multi-channel feature telemetry from Machine Node."""
+    # 1. Register Machine Node Device
+    dev_resp = client.post("/api/devices", json={
+        "device_id": "MN-LATHE-01",
+        "device_type": "MACHINE_NODE",
+        "status": "ONLINE"
+    })
+    assert dev_resp.status_code in (201, 200, 400) # Created or already exists
+
+    # 2. Create Active Session
+    sess_resp = client.post("/api/sessions", json={
+        "session_id": "SESS-MNODE-TEST",
+        "trainee_id": "TR-INTEL-1",
+        "device_id": "MN-LATHE-01",
+        "session_type": "TRAINING"
+    })
+    assert sess_resp.status_code == 201
+
+    # 3. Post compact feature readings (RMS, Peak, Crest Factor, Band Low)
+    features = [
+        ("VIBRATION_RMS", 0.4215, "g", "NORMAL"),
+        ("VIBRATION_PEAK", 1.2850, "g", "NORMAL"),
+        ("VIBRATION_CREST_FACTOR", 3.0486, "ratio", "NORMAL"),
+        ("VIBRATION_BAND_LOW", 0.4100, "g", "NORMAL")
+    ]
+    for stype, sval, sunit, sstatus in features:
+        read_resp = client.post("/api/readings", json={
+            "session_id": "SESS-MNODE-TEST",
+            "device_id": "MN-LATHE-01",
+            "sensor_type": stype,
+            "value": sval,
+            "unit": sunit,
+            "status": sstatus
+        })
+        assert read_resp.status_code == 201, f"Failed for {stype}: {read_resp.text}"
+        assert read_resp.json()["sensor_type"] == stype
+
+    # 4. Verify readings appear in session readings endpoint
+    list_resp = client.get("/api/sessions/SESS-MNODE-TEST/readings")
+    assert list_resp.status_code == 200
+    types = [r["sensor_type"] for r in list_resp.json()]
+    assert "VIBRATION_RMS" in types
+    assert "VIBRATION_PEAK" in types
+    assert "VIBRATION_CREST_FACTOR" in types
+
