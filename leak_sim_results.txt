@@ -1,0 +1,43 @@
+TABLE A: error (cm) vs leak vibration level, L=3 m, a=400 m/s exact, T=1 s
+band_Hz   sensor    level_mg  SNR_dB   median_cm   P90_cm
+80-600   ADXL345      0.5    -22.4       86.1     190.8
+80-600   ADXL345      1.0    -16.4      114.6     187.6
+80-600   ADXL345      2.0    -10.4        3.2     121.3
+80-600   ADXL345      5.0     -2.4        0.5       1.1
+80-600   ADXL345     10.0      3.6        0.2       0.4
+80-600   ADXL345     30.0     13.1        0.1       0.2
+80-600   IIS3DWB      0.5    -10.7        3.6     141.3
+80-600   IIS3DWB      1.0     -4.7        0.7       1.4
+80-600   IIS3DWB      2.0      1.3        0.3       0.6
+80-600   IIS3DWB      5.0      9.3        0.1       0.2
+80-600   IIS3DWB     10.0     15.3        0.0       0.1
+80-600   IIS3DWB     30.0     24.9        0.0       0.0
+80-2000  ADXL345      0.5    -27.3       94.5     202.2
+80-2000  ADXL345      1.0    -21.2       78.0     208.7
+80-2000  ADXL345      2.0    -15.2       86.9     218.1
+80-2000  ADXL345      5.0     -7.3        0.8       1.5
+80-2000  ADXL345     10.0     -1.3        0.7       1.2
+80-2000  ADXL345     30.0      8.3        0.8       1.1
+80-2000  IIS3DWB      0.5    -16.4       76.9     205.1
+80-2000  IIS3DWB      1.0    -10.3        0.4       0.9
+80-2000  IIS3DWB      2.0     -4.3        0.1       0.3
+80-2000  IIS3DWB      5.0      3.6        0.0       0.1
+80-2000  IIS3DWB     10.0      9.7        0.0       0.0
+80-2000  IIS3DWB     30.0     19.2        0.0       0.0
+
+TABLE B: error sources at 10 mg leak level, band 80-600 Hz
+sensor    case                                  median_cm   P90_cm
+ADXL345   ideal                                             0.2       0.5
+ADXL345   wave speed +10% wrong                             4.3       9.1
+ADXL345   wave speed -10% wrong                             4.6       9.2
+ADXL345   ODR mismatch 0.075% (residual after FINE trim)      7.4       8.0
+ADXL345   ODR mismatch 0.15%                               15.1      16.0
+ADXL345   ODR mismatch 1% (uncorrected, typ spec)         104.6     179.4
+ADXL345   ODR mismatch 1%, window 0.25 s                   30.0      41.0
+IIS3DWB   ideal                                             0.0       0.1
+IIS3DWB   wave speed +10% wrong                             5.2       9.1
+IIS3DWB   wave speed -10% wrong                             5.0       8.9
+IIS3DWB   ODR mismatch 0.075% (residual after FINE trim)      7.5       7.9
+IIS3DWB   ODR mismatch 0.15%                               15.0      15.9
+IIS3DWB   ODR mismatch 1% (uncorrected, typ spec)          44.3     178.3
+IIS3DWB   ODR mismatch 1%, window 0.25 s                   23.5      36.5
