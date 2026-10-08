@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 from app.database.database import get_session
 from app.models.trainee import Trainee
+from app.models.session import Session as DBSession
 from app.schemas.trainee import TraineeCreate, TraineeUpdate
 
 router = APIRouter(prefix="/api/trainees", tags=["Trainees"])
@@ -22,7 +23,6 @@ def create_trainee(trainee: TraineeCreate, session: Session = Depends(get_sessio
     existing = session.exec(select(Trainee).where(Trainee.trainee_id == trainee.trainee_id)).first()
     if existing:
         raise HTTPException(status_code=400, detail="Trainee ID already exists")
-    
     db_trainee = Trainee.model_validate(trainee)
     session.add(db_trainee)
     session.commit()
@@ -34,11 +34,9 @@ def update_trainee(id: int, trainee_update: TraineeUpdate, session: Session = De
     db_trainee = session.get(Trainee, id)
     if not db_trainee:
         raise HTTPException(status_code=404, detail="Trainee not found")
-    
     update_data = trainee_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(db_trainee, key, value)
-        
     session.add(db_trainee)
     session.commit()
     session.refresh(db_trainee)
@@ -49,5 +47,14 @@ def delete_trainee(id: int, session: Session = Depends(get_session)):
     trainee = session.get(Trainee, id)
     if not trainee:
         raise HTTPException(status_code=404, detail="Trainee not found")
+    # Safety: block deletion if the trainee has any sessions
+    sessions_exist = session.exec(
+        select(DBSession).where(DBSession.trainee_id == trainee.trainee_id)
+    ).first()
+    if sessions_exist:
+        raise HTTPException(
+            status_code=409,
+            detail="Cannot delete trainee with existing sessions. Complete or cancel sessions first."
+        )
     session.delete(trainee)
     session.commit()
