@@ -6,36 +6,43 @@ export const SystemBar: React.FC = () => {
   const { backendConnected, databaseConnected, pollingIntervalMs } = useSystem();
 
   return (
-    <div
+    <footer
+      role="contentinfo"
+      aria-label="System status"
       style={{
-        padding: '0.4rem 1.5rem',
+        padding: '0.28rem 1.25rem',
         backgroundColor: 'var(--bg-surface)',
-        borderTop: '1px solid var(--border-main)',
+        borderTop: '1px solid var(--border-muted)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        fontSize: '0.75rem',
+        fontSize: '0.68rem',
         color: 'var(--text-muted)',
         fontFamily: 'var(--font-mono)',
+        flexShrink: 0,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Server size={12} color={backendConnected ? 'var(--state-normal-text)' : 'var(--state-danger-text)'} />
-          <span>API: {backendConnected ? 'ONLINE' : 'UNREACHABLE'}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <Server
+            size={11}
+            color={backendConnected ? 'var(--state-normal-dot)' : 'var(--state-danger-dot)'}
+          />
+          <span>API: {backendConnected ? 'Online' : 'Offline'}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Database size={12} color={databaseConnected ? 'var(--state-normal-text)' : 'var(--state-danger-text)'} />
-          <span>DATABASE: {databaseConnected ? 'SQLITE OK' : 'OFFLINE'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <Database
+            size={11}
+            color={databaseConnected ? 'var(--state-normal-dot)' : 'var(--state-danger-dot)'}
+          />
+          <span>DB: {databaseConnected ? 'SQLite OK' : 'Offline'}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Clock size={12} />
-          <span>POLL RATE: {pollingIntervalMs / 1000}s</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <Clock size={11} />
+          <span>Poll: {pollingIntervalMs / 1000}s</span>
         </div>
       </div>
-      <div>
-        <span>DEMO / TRAINING PROTOTYPE</span>
-      </div>
-    </div>
+      <span>SIH Safety Monitor - Demo Prototype</span>
+    </footer>
   );
 };

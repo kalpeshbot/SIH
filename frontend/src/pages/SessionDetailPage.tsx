@@ -7,15 +7,20 @@ import { ErrorState } from '../components/common/ErrorState';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { SensorChart } from '../components/sessions/SensorChart';
 import { SessionTimeline } from '../components/sessions/SessionTimeline';
+import { SessionAnalyticsCard } from '../components/sessions/SessionAnalyticsCard';
+import { SessionReportModal } from '../components/sessions/SessionReportModal';
 import { ActiveAlertsList } from '../components/dashboard/ActiveAlertsList';
 import {
   getSession,
   getSessionReadings,
   getAlerts,
+  getDevices,
+  getSessionAnalytics,
   updateSession,
   acknowledgeAlert,
+  downloadSessionExport,
 } from '../api/endpoints';
-import { SessionRecord, SensorReading, Alert } from '../api/types';
+import { SessionRecord, SensorReading, Alert, Device, SessionAnalytics } from '../api/types';
 import {
   ArrowLeft,
   CheckCircle,
@@ -25,18 +30,23 @@ import {
   Radio,
   Clock,
   PlaySquare,
+  MapPin,
+  FileText,
 } from 'lucide-react';
 
 export const SessionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [session, setSession] = useState<SessionRecord | null>(null);
+  const [analytics, setAnalytics] = useState<SessionAnalytics | null>(null);
   const [readings, setReadings] = useState<SensorReading[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Lifecycle modals
+  // Modals
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [isCompleteConfirmOpen, setIsCompleteConfirmOpen] = useState(false);
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -47,12 +57,17 @@ export const SessionDetailPage: React.FC = () => {
       const sessionData = await getSession(parseInt(id, 10));
       setSession(sessionData);
 
-      const [readingsData, alertsData] = await Promise.all([
+      const [readingsData, alertsData, devicesData, analyticsData] = await Promise.all([
         getSessionReadings(sessionData.session_id),
         getAlerts({ session_id: sessionData.session_id }),
+        getDevices(),
+        getSessionAnalytics(sessionData.id),
       ]);
       setReadings(readingsData);
       setAlerts(alertsData);
+      setAnalytics(analyticsData);
+      const sessionDevice = devicesData.find((d: Device) => d.device_id === sessionData.device_id) || null;
+      setDevice(sessionDevice);
       setError(null);
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -118,36 +133,6 @@ export const SessionDetailPage: React.FC = () => {
     }
   };
 
-  // Export session data
-  const exportData = (format: 'json' | 'csv') => {
-    if (!session) return;
-    let dataStr = '';
-    let filename = `session_${session.session_id}_export.${format}`;
-
-    if (format === 'json') {
-      const payload = {
-        session,
-        telemetry: readings,
-        alerts,
-        exported_at: new Date().toISOString(),
-      };
-      dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
-    } else {
-      const headers = 'id,session_id,device_id,timestamp,sensor_type,value,unit,status\n';
-      const rows = readings.map((r) =>
-        `${r.id},"${r.session_id}","${r.device_id}","${r.timestamp}","${r.sensor_type}",${r.value},"${r.unit}","${r.status}"`
-      ).join('\n');
-      dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(headers + rows);
-    }
-
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', filename);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
   if (loading) {
     return (
       <>
@@ -179,10 +164,9 @@ export const SessionDetailPage: React.FC = () => {
   }
 
   const startTime = new Date(session.start_time);
-  const endTime = session.end_time ? new Date(session.end_time) : null;
-  const durationText = endTime
-    ? `${Math.round((endTime.getTime() - startTime.getTime()) / 60000)} minutes`
-    : 'Session in progress';
+  const durationText = analytics?.session.duration_formatted || (session.end_time
+    ? `${Math.round((new Date(session.end_time).getTime() - startTime.getTime()) / 60000)} minutes`
+    : 'In progress');
 
   const unacknowledgedAlerts = alerts.filter((a) => !a.acknowledged);
 
@@ -201,19 +185,31 @@ export const SessionDetailPage: React.FC = () => {
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {/* Session Report View */}
+            {analytics && (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setIsReportOpen(true)}
+                title="View printable trainer report"
+              >
+                <FileText size={14} /> View Session Report
+              </button>
+            )}
+
             {/* Export buttons */}
             <button
               type="button"
               className="btn btn-secondary btn-sm"
-              onClick={() => exportData('csv')}
-              title="Download raw sensor telemetry as CSV"
+              onClick={() => downloadSessionExport(session.session_id, 'csv')}
+              title="Download session summary and telemetry as CSV"
             >
               <Download size={14} /> Export CSV
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
-              onClick={() => exportData('json')}
+              onClick={() => downloadSessionExport(session.session_id, 'json')}
               title="Download session object and telemetry as JSON"
             >
               <Download size={14} /> Export JSON
@@ -241,7 +237,7 @@ export const SessionDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Session Metadata Card */}
+        {/* Session Summary Metadata Card */}
         <div className="card">
           <div className="card-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -275,7 +271,7 @@ export const SessionDetailPage: React.FC = () => {
                   <Radio size={12} /> Device Assigned
                 </span>
                 <div style={{ fontWeight: 600, marginTop: '0.2rem', fontFamily: 'var(--font-mono)' }}>
-                  {session.device_id}
+                  {session.device_id} ({device?.device_type || 'HANDHELD'})
                 </div>
               </div>
 
@@ -290,7 +286,7 @@ export const SessionDetailPage: React.FC = () => {
 
               <div>
                 <span className="label">Duration</span>
-                <div style={{ fontSize: '0.85rem', marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '0.85rem', marginTop: '0.2rem', fontWeight: 600, color: 'var(--primary-text)' }}>
                   {durationText}
                 </div>
               </div>
@@ -303,6 +299,27 @@ export const SessionDetailPage: React.FC = () => {
               </div>
 
               <div>
+                <span className="label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <MapPin size={12} /> Zone
+                </span>
+                <div style={{ fontSize: '0.85rem', marginTop: '0.2rem', fontFamily: 'var(--font-mono)' }}>
+                  {session.zone_id || 'No zone assigned'}
+                </div>
+              </div>
+
+              {device && (
+                <div>
+                  <span className="label">Device Status / Firmware</span>
+                  <div style={{ fontSize: '0.85rem', marginTop: '0.2rem' }}>
+                    <StatusBadge status={device.status} />
+                    <span style={{ marginLeft: '0.4rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      v{device.firmware_version || '1.0.0'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div>
                 <span className="label">Result Assessment</span>
                 <div style={{ fontSize: '0.85rem', marginTop: '0.2rem', fontWeight: 600 }}>
                   {session.result || 'Pending Completion'}
@@ -312,12 +329,26 @@ export const SessionDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Hazard Alerts Specific to this Session */}
-        {unacknowledgedAlerts.length > 0 && (
+        {/* Analytics Summary Card: Readings & Alerts Breakdown */}
+        {analytics && (
+          <SessionAnalyticsCard
+            readingStats={analytics.reading_stats}
+            alertStats={analytics.alert_stats}
+          />
+        )}
+
+        {/* Active Hazard Alerts List */}
+        {unacknowledgedAlerts.length > 0 ? (
           <ActiveAlertsList
             alerts={unacknowledgedAlerts}
             onAcknowledge={handleAcknowledgeAlert}
           />
+        ) : (
+          <div className="card" style={{ padding: '1.25rem', textAlign: 'center', backgroundColor: 'var(--bg-subtle)' }}>
+            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              No unacknowledged alerts.
+            </p>
+          </div>
         )}
 
         {/* Sensor Visualizations */}
@@ -330,6 +361,15 @@ export const SessionDetailPage: React.FC = () => {
           alerts={alerts}
         />
       </div>
+
+      {/* Trainer Printable Session Report Modal */}
+      {analytics && (
+        <SessionReportModal
+          isOpen={isReportOpen}
+          onClose={() => setIsReportOpen(false)}
+          analytics={analytics}
+        />
+      )}
 
       {/* Confirmation Dialogs for Lifecycle */}
       <ConfirmDialog
@@ -356,3 +396,4 @@ export const SessionDetailPage: React.FC = () => {
     </>
   );
 };
+

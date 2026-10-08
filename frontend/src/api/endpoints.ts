@@ -17,6 +17,7 @@ import {
   Alert,
   AlertCreate,
   HealthResponse,
+  SessionAnalytics,
 } from './types';
 
 // Health
@@ -62,6 +63,21 @@ export const updateSession = (id: number, data: SessionUpdate) =>
   apiClient.patch<SessionRecord>(`/api/sessions/${id}`, data);
 export const getSessionReadings = (sessionId: string) =>
   apiClient.get<SensorReading[]>(`/api/sessions/${sessionId}/readings`);
+export const getSessionAnalytics = (idOrCode: string | number) =>
+  apiClient.get<SessionAnalytics>(`/api/sessions/${idOrCode}/analytics`);
+
+export const downloadSessionExport = (idOrCode: string | number, format: 'csv' | 'json' = 'csv') => {
+  window.open(`/api/sessions/${idOrCode}/export?format=${format}`, '_blank');
+};
+
+export const downloadReadingsExport = (idOrCode: string | number, format: 'csv' | 'json' = 'csv') => {
+  window.open(`/api/sessions/${idOrCode}/export/readings?format=${format}`, '_blank');
+};
+
+export const downloadAlertsExport = (idOrCode: string | number, format: 'csv' | 'json' = 'csv') => {
+  window.open(`/api/sessions/${idOrCode}/export/alerts?format=${format}`, '_blank');
+};
+
 
 // Readings Ingestion
 export const ingestReading = (data: SensorReadingCreate) =>

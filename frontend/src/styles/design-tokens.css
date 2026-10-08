@@ -1,104 +1,105 @@
 :root {
-  /* Color Palette - Industrial Neutral Light Mode */
-  --bg-app: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f5f9;
-  --bg-subtle: #f8fafc;
-  --border-main: #e2e8f0;
-  --border-muted: #cbd5e1;
-  --border-focus: #0284c7;
+  /* ─── Background Layers (Chrome-inspired) ─── */
+  --bg-app:             #f1f3f4; /* Chrome new tab / background color */
+  --bg-surface:         #ffffff; /* White cards and sidebar */
+  --bg-surface-elevated:#f8f9fa; /* Slightly off-white for table headers */
+  --bg-subtle:          #f1f3f4; /* Subtle gray for footers/active states */
 
-  /* Typography Colors */
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --text-inverse: #ffffff;
+  /* ─── Borders ─── */
+  --border-main:  #dadce0; /* Chrome standard border */
+  --border-muted: #e8eaed; /* Lighter border */
+  --border-focus: #1a73e8; /* Chrome focus blue */
 
-  /* Primary Action Colors (Restrained Industrial Blue) */
-  --primary: #0284c7;
-  --primary-hover: #0369a1;
-  --primary-active: #075985;
-  --primary-subtle: #f0f9ff;
-  --primary-border: #bae6fd;
-  --primary-text: #0369a1;
+  /* ─── Typography ─── */
+  --text-primary:   #202124; /* Chrome dark text */
+  --text-secondary: #5f6368; /* Chrome gray text */
+  --text-muted:     #80868b; /* Lighter gray text */
+  --text-inverse:   #ffffff;
 
-  /* Semantic State: Normal / Success */
-  --state-normal-bg: #f0fdf4;
-  --state-normal-text: #15803d;
-  --state-normal-border: #bbf7d0;
+  /* ─── Primary (Google/Chrome Blue) ─── */
+  --primary:        #1a73e8;
+  --primary-hover:  #1b66c9;
+  --primary-active: #174ea6;
+  --primary-subtle: #e8f0fe;
+  --primary-border: #d2e3fc;
+  --primary-text:   #1967d2;
 
-  /* Semantic State: Warning / Caution */
-  --state-warning-bg: #fffbeb;
-  --state-warning-text: #b45309;
-  --state-warning-border: #fde68a;
+  /* ─── Semantic States ─── */
+  --state-normal-bg:     #e6f4ea;
+  --state-normal-text:   #137333;
+  --state-normal-border: #ceead6;
+  --state-normal-dot:    #188038;
 
-  /* Semantic State: Danger / Fault / Critical */
-  --state-danger-bg: #fef2f2;
-  --state-danger-text: #b91c1c;
-  --state-danger-border: #fecaca;
+  --state-warning-bg:     #fef7e0;
+  --state-warning-text:   #b06000;
+  --state-warning-border: #feefc3;
+  --state-warning-dot:    #f29900;
 
-  /* Semantic State: Neutral / Offline */
-  --state-neutral-bg: #f1f5f9;
-  --state-neutral-text: #475569;
-  --state-neutral-border: #cbd5e1;
+  --state-danger-bg:     #fce8e6;
+  --state-danger-text:   #c5221f;
+  --state-danger-border: #fad2cf;
+  --state-danger-dot:    #d93025;
 
-  /* UI Dimensions & Shapes */
-  --radius-sm: 3px;
-  --radius-md: 5px;
-  --radius-lg: 6px;
+  --state-neutral-bg:     #f1f3f4;
+  --state-neutral-text:   #5f6368;
+  --state-neutral-border: #dadce0;
+
+  /* ─── Shape ─── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ─── Typography ─── */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
 
-  /* Shadows (Flat Industrial) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  /* ─── Shadows ─── */
+  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.1), 0 1px 3px 1px rgba(60, 64, 67, 0.05);
+  --shadow-md: 0 1px 2px 0 rgba(60, 64, 67, 0.15), 0 2px 6px 2px rgba(60, 64, 67, 0.1);
 }
 
 [data-theme='dark'] {
-  /* Color Palette - Industrial Neutral Dark Mode */
-  --bg-app: #090d16;
-  --bg-surface: #111827;
-  --bg-surface-elevated: #1f2937;
-  --bg-subtle: #0f172a;
-  --border-main: #283548;
-  --border-muted: #374151;
-  --border-focus: #38bdf8;
+  --bg-app:             #202124;
+  --bg-surface:         #292a2d;
+  --bg-surface-elevated:#35363a;
+  --bg-subtle:          #35363a;
 
-  /* Typography Colors */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-inverse: #0f172a;
+  --border-main:  #5f6368;
+  --border-muted: #3c4043;
+  --border-focus: #8ab4f8;
 
-  /* Primary Action Colors */
-  --primary: #0284c7;
-  --primary-hover: #38bdf8;
-  --primary-active: #0ea5e9;
-  --primary-subtle: #082f49;
-  --primary-border: #0369a1;
-  --primary-text: #7dd3fc;
+  --text-primary:   #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-muted:     #80868b;
+  --text-inverse:   #202124;
 
-  /* Semantic State: Normal / Success */
-  --state-normal-bg: #052e16;
-  --state-normal-text: #4ade80;
-  --state-normal-border: #166534;
+  --primary:        #8ab4f8;
+  --primary-hover:  #aecbfa;
+  --primary-active: #d2e3fc;
+  --primary-subtle: #8ab4f820;
+  --primary-border: #8ab4f840;
+  --primary-text:   #8ab4f8;
 
-  /* Semantic State: Warning / Caution */
-  --state-warning-bg: #451a03;
-  --state-warning-text: #fbbf24;
-  --state-warning-border: #92400e;
+  --state-normal-bg:     #81c99520;
+  --state-normal-text:   #81c995;
+  --state-normal-border: #81c99540;
+  --state-normal-dot:    #81c995;
 
-  /* Semantic State: Danger / Fault / Critical */
-  --state-danger-bg: #450a0a;
-  --state-danger-text: #f87171;
-  --state-danger-border: #991b1b;
+  --state-warning-bg:     #fde29320;
+  --state-warning-text:   #fde293;
+  --state-warning-border: #fde29340;
+  --state-warning-dot:    #fde293;
 
-  /* Semantic State: Neutral / Offline */
-  --state-neutral-bg: #1e293b;
-  --state-neutral-text: #94a3b8;
-  --state-neutral-border: #334155;
+  --state-danger-bg:     #f28b8220;
+  --state-danger-text:   #f28b82;
+  --state-danger-border: #f28b8240;
+  --state-danger-dot:    #f28b82;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --state-neutral-bg:     #3c4043;
+  --state-neutral-text:   #9aa0a6;
+  --state-neutral-border: #5f6368;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 2px 6px 2px rgba(0, 0, 0, 0.2);
 }

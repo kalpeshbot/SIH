@@ -6,6 +6,7 @@ VALID_STATUSES = {"ONLINE", "OFFLINE", "FAULT", "UNKNOWN"}
 class DeviceCreate(BaseModel):
     device_id: str
     device_type: str
+    firmware_version: str | None = None
     status: str = "OFFLINE"
     battery: int | None = Field(default=None, ge=0, le=100)
     zone_id: str | None = None
@@ -28,6 +29,7 @@ class DeviceUpdate(BaseModel):
     status: str | None = None
     battery: int | None = Field(default=None, ge=0, le=100)
     zone_id: str | None = None
+    firmware_version: str | None = None
     last_seen: datetime | None = None
 
     @field_validator("status")

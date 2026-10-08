@@ -12,6 +12,8 @@ class Session(SQLModel, table=True):
     session_type: str # LEAK_DETECTION, WATER_LEAK, GAS_HAZARD, TRAINING, DEMO
     status: str = "ACTIVE" # ACTIVE, COMPLETED, CANCELLED, FAULT
     result: Optional[str] = None # NORMAL, WARNING, DANGER, FAULT, INCONCLUSIVE
+    zone_id: Optional[str] = Field(default=None, foreign_key="zones.zone_id")
     start_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     end_time: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+

@@ -1,6 +1,6 @@
 export type DeviceType = 'HANDHELD' | 'WEARABLE' | 'BEACON';
 export type DeviceStatus = 'ONLINE' | 'OFFLINE' | 'FAULT' | 'UNKNOWN';
-export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED' | 'FAULT';
 export type AlertSeverity = 'INFO' | 'WARNING' | 'DANGER' | 'CRITICAL';
 export type ReadingStatus = 'NORMAL' | 'WARNING' | 'DANGER';
 
@@ -45,6 +45,7 @@ export interface Device {
   id: number;
   device_id: string;
   device_type: DeviceType;
+  firmware_version?: string | null;
   status: DeviceStatus;
   battery: number;
   zone_id?: string | null;
@@ -56,6 +57,7 @@ export interface Device {
 export interface DeviceCreate {
   device_id: string;
   device_type: DeviceType;
+  firmware_version?: string;
   status?: DeviceStatus;
   battery?: number;
   zone_id?: string | null;
@@ -72,6 +74,7 @@ export interface SessionRecord {
   session_id: string;
   trainee_id: string;
   device_id: string;
+  zone_id?: string | null;
   session_type: string;
   status: SessionStatus;
   result?: string | null;
@@ -84,6 +87,7 @@ export interface SessionCreate {
   session_id: string;
   trainee_id: string;
   device_id: string;
+  zone_id?: string;
   session_type: string;
   start_time?: string;
 }
@@ -145,3 +149,63 @@ export interface ApiErrorDetail {
   status: number;
   fieldErrors?: Record<string, string>;
 }
+
+export interface SensorStatItem {
+  sensor_type: string;
+  unit: string;
+  count: number;
+  min: number;
+  max: number;
+  avg: number;
+}
+
+export interface ReadingStatistics {
+  total_readings: number;
+  first_reading_time?: string | null;
+  last_reading_time?: string | null;
+  by_sensor_type: SensorStatItem[];
+}
+
+export interface AlertSeverityCounts {
+  INFO: number;
+  WARNING: number;
+  DANGER: number;
+  CRITICAL: number;
+  FAULT: number;
+}
+
+export interface AlertStatistics {
+  total_alerts: number;
+  unacknowledged_alerts: number;
+  acknowledged_alerts: number;
+  severity_counts: AlertSeverityCounts;
+  first_alert_time?: string | null;
+  latest_alert_time?: string | null;
+}
+
+export interface SessionSummary {
+  id: number;
+  session_id: string;
+  trainee_id: string;
+  device_id: string;
+  device_type?: string | null;
+  firmware_version?: string | null;
+  zone_id?: string | null;
+  status: SessionStatus;
+  session_type: string;
+  result?: string | null;
+  start_time: string;
+  end_time?: string | null;
+  duration_seconds?: number | null;
+  duration_formatted: string;
+  reading_count: number;
+  alert_count: number;
+}
+
+export interface SessionAnalytics {
+  session: SessionSummary;
+  reading_stats: ReadingStatistics;
+  alert_stats: AlertStatistics;
+  recent_alerts: Alert[];
+}
+

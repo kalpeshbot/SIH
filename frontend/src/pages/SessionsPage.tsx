@@ -6,30 +6,35 @@ import { TableSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorState } from '../components/common/ErrorState';
 import { EmptyState } from '../components/common/EmptyState';
 import { CreateSessionModal } from '../components/sessions/CreateSessionModal';
-import { getSessions, getTrainees, getDevices, createSession } from '../api/endpoints';
-import { SessionRecord, Trainee, Device, SessionCreate } from '../api/types';
+import { getSessions, getTrainees, getDevices, getZones, createSession } from '../api/endpoints';
+import { SessionRecord, Trainee, Device, Zone, SessionCreate } from '../api/types';
 import { PlaySquare, Plus, Search, ArrowRight } from 'lucide-react';
 
 export const SessionsPage: React.FC = () => {
   const [sessions, setSessions] = useState<SessionRecord[]>([]);
   const [trainees, setTrainees] = useState<Trainee[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [zoneFilter, setZoneFilter] = useState('ALL');
+  const [traineeFilter, setTraineeFilter] = useState('ALL');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [sessionsData, traineesData, devicesData] = await Promise.all([
+      const [sessionsData, traineesData, devicesData, zonesData] = await Promise.all([
         getSessions(),
         getTrainees(),
         getDevices(),
+        getZones(),
       ]);
       setSessions(sessionsData);
       setTrainees(traineesData);
       setDevices(devicesData);
+      setZones(zonesData);
       setError(null);
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -54,7 +59,9 @@ export const SessionsPage: React.FC = () => {
       s.trainee_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.device_id.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || s.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesZone = zoneFilter === 'ALL' || s.zone_id === zoneFilter;
+    const matchesTrainee = traineeFilter === 'ALL' || s.trainee_id === traineeFilter;
+    return matchesSearch && matchesStatus && matchesZone && matchesTrainee;
   });
 
   return (
@@ -76,12 +83,12 @@ export const SessionsPage: React.FC = () => {
             flexWrap: 'wrap',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: '280px' }}>
-            <div style={{ position: 'relative', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '280px', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
               <input
                 type="text"
                 className="form-input"
-                placeholder="Search by session code, trainee, or device ID..."
+                placeholder="Search session ID, trainee, device..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ paddingLeft: '2rem' }}
@@ -105,6 +112,34 @@ export const SessionsPage: React.FC = () => {
               <option value="COMPLETED">COMPLETED</option>
               <option value="CANCELLED">CANCELLED</option>
             </select>
+
+            <select
+              className="form-select"
+              value={zoneFilter}
+              onChange={(e) => setZoneFilter(e.target.value)}
+              style={{ width: 'auto' }}
+            >
+              <option value="ALL">All Zones</option>
+              {zones.map((z) => (
+                <option key={z.zone_id} value={z.zone_id}>
+                  {z.name} ({z.zone_id})
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="form-select"
+              value={traineeFilter}
+              onChange={(e) => setTraineeFilter(e.target.value)}
+              style={{ width: 'auto' }}
+            >
+              <option value="ALL">All Trainees</option>
+              {trainees.map((t) => (
+                <option key={t.trainee_id} value={t.trainee_id}>
+                  {t.name} ({t.trainee_id})
+                </option>
+              ))}
+            </select>
           </div>
 
           <button
@@ -120,7 +155,7 @@ export const SessionsPage: React.FC = () => {
         {error ? (
           <ErrorState message={error} onRetry={fetchData} />
         ) : loading ? (
-          <TableSkeleton rows={5} cols={7} />
+          <TableSkeleton rows={5} cols={9} />
         ) : filteredSessions.length === 0 ? (
           <EmptyState
             title="No Training Sessions Found"
@@ -141,6 +176,7 @@ export const SessionsPage: React.FC = () => {
                   <th>Session Code</th>
                   <th>Trainee ID</th>
                   <th>Device ID</th>
+                  <th>Zone ID</th>
                   <th>Module / Type</th>
                   <th>Status</th>
                   <th>Started At</th>
@@ -165,6 +201,7 @@ export const SessionsPage: React.FC = () => {
                       </td>
                       <td className="mono">{session.trainee_id}</td>
                       <td className="mono">{session.device_id}</td>
+                      <td className="mono">{session.zone_id || '—'}</td>
                       <td>{session.session_type}</td>
                       <td>
                         <StatusBadge status={session.status} />
@@ -212,6 +249,7 @@ export const SessionsPage: React.FC = () => {
         onSubmit={handleCreateSession}
         trainees={trainees}
         devices={devices}
+        zones={zones}
       />
     </>
   );

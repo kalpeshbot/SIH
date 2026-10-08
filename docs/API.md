@@ -141,6 +141,26 @@
 - **Purpose**: Retrieve all time-series sensor readings recorded for a specific session code (e.g. `SESS-2026-001`).
 - **Response**: `200 OK` `[ReadingRead]` | `404 Not Found` (Session does not exist)
 
+### `GET /api/sessions/{identifier}/analytics`
+- **Purpose**: Compute data-backed session summary, duration, per-sensor reading statistics (min/max/avg), alert severity counts, and chronological alert timeline.
+- **Identifier**: Integer primary key `id` OR string code `session_id`.
+- **Response**: `200 OK` `SessionAnalytics` | `404 Not Found`
+
+### `GET /api/sessions/{identifier}/export`
+- **Purpose**: Export complete session metadata, summary aggregates, telemetry, and alerts.
+- **Query Parameter**: `format` (`csv` or `json`, default `csv`).
+- **Response**: `200 OK` File Attachment (`session_{session_id}_export.csv` or `.json`) | `400 Bad Request` | `404 Not Found`
+
+### `GET /api/sessions/{identifier}/export/readings`
+- **Purpose**: Export time-series sensor readings for the specified session.
+- **Query Parameter**: `format` (`csv` or `json`, default `csv`).
+- **Response**: `200 OK` File Attachment (`readings_{session_id}.csv` or `.json`) | `400 Bad Request` | `404 Not Found`
+
+### `GET /api/sessions/{identifier}/export/alerts`
+- **Purpose**: Export hazard alerts for the specified session.
+- **Query Parameter**: `format` (`csv` or `json`, default `csv`).
+- **Response**: `200 OK` File Attachment (`alerts_{session_id}.csv` or `.json`) | `400 Bad Request` | `404 Not Found`
+
 ---
 
 ## Sensor Readings Ingestion (`/api/readings`)
