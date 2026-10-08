@@ -50,6 +50,7 @@ export interface Device {
   zone_id?: string | null;
   created_at: string;
   updated_at?: string | null;
+  last_seen?: string | null;
 }
 
 export interface DeviceCreate {

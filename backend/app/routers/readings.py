@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 from datetime import datetime, timezone
 from app.database.database import get_session
@@ -22,9 +22,12 @@ def create_reading(reading: SensorReadingCreate, session: Session = Depends(get_
     if db_sess.status not in ("ACTIVE",):
         raise HTTPException(status_code=400, detail=f"Session is {db_sess.status}; cannot add readings to a closed session")
 
-    # Validate device exists
-    if not session.exec(select(Device).where(Device.device_id == reading.device_id)).first():
+    # Validate device exists and update last_seen
+    db_device = session.exec(select(Device).where(Device.device_id == reading.device_id)).first()
+    if not db_device:
         raise HTTPException(status_code=400, detail="Invalid device_id: device does not exist")
+    db_device.last_seen = datetime.now(timezone.utc)
+    session.add(db_device)
 
     # Resolve timestamp
     ts = reading.timestamp if reading.timestamp is not None else datetime.now(timezone.utc)

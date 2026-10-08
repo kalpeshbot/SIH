@@ -10,6 +10,41 @@ import { getDevices, getZones, createDevice, deleteDevice } from '../api/endpoin
 import { Device, Zone, DeviceCreate } from '../api/types';
 import { Radio, Plus, Battery, BatteryCharging, Trash2, Search } from 'lucide-react';
 
+// ---------------------------------------------------------------
+// Connectivity Status Logic
+// Source of truth: backend `last_seen` field.
+// ONLINE  = seen within 30 seconds
+// RECENT  = seen within 5 minutes
+// OFFLINE = never seen, or silent for 5+ minutes
+// ---------------------------------------------------------------
+type ConnectivityStatus = 'ONLINE' | 'RECENT' | 'OFFLINE' | 'NEVER';
+
+function getConnectivityStatus(lastSeen: string | null | undefined): ConnectivityStatus {
+  if (!lastSeen) return 'NEVER';
+  const ageMs = Date.now() - new Date(lastSeen).getTime();
+  if (ageMs < 30_000) return 'ONLINE';
+  if (ageMs < 300_000) return 'RECENT';
+  return 'OFFLINE';
+}
+
+function formatLastSeen(lastSeen: string | null | undefined): string {
+  if (!lastSeen) return 'Never';
+  const ageMs = Date.now() - new Date(lastSeen).getTime();
+  const seconds = Math.floor(ageMs / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ago`;
+}
+
+const connectivityStyles: Record<ConnectivityStatus, { bg: string; color: string; label: string }> = {
+  ONLINE:  { bg: 'var(--state-normal-bg)',  color: 'var(--state-normal-text)',  label: 'Online' },
+  RECENT:  { bg: 'var(--state-warning-bg)', color: 'var(--state-warning-text)', label: 'Recent' },
+  OFFLINE: { bg: 'var(--state-danger-bg)',  color: 'var(--state-danger-text)',  label: 'Offline' },
+  NEVER:   { bg: 'var(--surface-2)',        color: 'var(--text-muted)',          label: 'Never seen' },
+};
+
 export const DevicesPage: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
@@ -21,6 +56,7 @@ export const DevicesPage: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deletingDevice, setDeletingDevice] = useState<Device | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [, setTick] = useState(0); // force re-render so relative timestamps update
 
   const fetchData = useCallback(async () => {
     try {
@@ -41,6 +77,17 @@ export const DevicesPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
+
+  // Refresh device list every 10 seconds to pick up new last_seen values from backend.
+  // Also tick every 5 seconds so relative timestamps ("3s ago") stay live in the UI.
+  useEffect(() => {
+    const dataInterval = setInterval(fetchData, 10_000);
+    const tickInterval = setInterval(() => setTick((t) => t + 1), 5_000);
+    return () => {
+      clearInterval(dataInterval);
+      clearInterval(tickInterval);
+    };
   }, [fetchData]);
 
   const handleCreate = async (data: DeviceCreate) => {
@@ -144,7 +191,7 @@ export const DevicesPage: React.FC = () => {
         {error ? (
           <ErrorState message={error} onRetry={fetchData} />
         ) : loading ? (
-          <TableSkeleton rows={4} cols={6} />
+          <TableSkeleton rows={4} cols={7} />
         ) : filteredDevices.length === 0 ? (
           <EmptyState
             title="No Devices Found"
@@ -163,56 +210,81 @@ export const DevicesPage: React.FC = () => {
               <thead>
                 <tr>
                   <th>Device Identifier</th>
-                  <th>Form Factor / Type</th>
-                  <th>Status</th>
+                  <th>Type</th>
+                  <th>Reg. Status</th>
+                  <th>Connectivity</th>
+                  <th>Last Seen</th>
                   <th>Battery</th>
-                  <th>Assigned Workshop Zone</th>
+                  <th>Zone</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredDevices.map((device) => (
-                  <tr key={device.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
-                        <Radio size={14} color="var(--primary)" />
-                        {device.device_id}
-                      </div>
-                    </td>
-                    <td>{device.device_type}</td>
-                    <td>
-                      <StatusBadge status={device.status} />
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                        {device.battery > 90 ? (
-                          <BatteryCharging size={14} color="var(--state-normal-text)" />
+                {filteredDevices.map((device) => {
+                  const connectivity = getConnectivityStatus(device.last_seen);
+                  const connStyle = connectivityStyles[connectivity];
+                  return (
+                    <tr key={device.id}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+                          <Radio size={14} color="var(--primary)" />
+                          {device.device_id}
+                        </div>
+                      </td>
+                      <td style={{ fontSize: '0.82rem' }}>{device.device_type}</td>
+                      <td>
+                        <StatusBadge status={device.status} />
+                      </td>
+                      <td>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '0.15rem 0.5rem',
+                            borderRadius: '3px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            letterSpacing: '0.02em',
+                            background: connStyle.bg,
+                            color: connStyle.color,
+                          }}
+                        >
+                          {connStyle.label}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+                        {formatLastSeen(device.last_seen)}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
+                          {device.battery != null && device.battery > 90 ? (
+                            <BatteryCharging size={14} color="var(--state-normal-text)" />
+                          ) : (
+                            <Battery size={14} color={device.battery != null && device.battery < 20 ? 'var(--state-danger-text)' : 'var(--text-secondary)'} />
+                          )}
+                          <span>{device.battery != null ? `${device.battery}%` : '--'}</span>
+                        </div>
+                      </td>
+                      <td>
+                        {device.zone_id ? (
+                          <span className="mono" style={{ fontSize: '0.85rem' }}>{device.zone_id}</span>
                         ) : (
-                          <Battery size={14} color={device.battery < 20 ? 'var(--state-danger-text)' : 'var(--text-secondary)'} />
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Unassigned</span>
                         )}
-                        <span>{device.battery}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      {device.zone_id ? (
-                        <span className="mono" style={{ fontSize: '0.85rem' }}>{device.zone_id}</span>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Unassigned</span>
-                      )}
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-icon btn-sm"
-                        onClick={() => setDeletingDevice(device)}
-                        title="Delete device registration"
-                        aria-label={`Delete ${device.device_id}`}
-                      >
-                        <Trash2 size={13} color="var(--state-danger-text)" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-icon btn-sm"
+                          onClick={() => setDeletingDevice(device)}
+                          title="Delete device registration"
+                          aria-label={`Delete ${device.device_id}`}
+                        >
+                          <Trash2 size={13} color="var(--state-danger-text)" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
