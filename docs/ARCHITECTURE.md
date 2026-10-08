@@ -1,31 +1,32 @@
 # Architecture
 
-## Current Backend Architecture
-The backend is built with FastAPI and SQLModel, using SQLite for data storage.
+## Complete System Architecture
+The SIH Vocational Training Safety Monitor combines an IoT sensor ingestion backend with an industrial web dashboard for operational monitoring.
 
 ```text
-Frontend (Future)
-   ↓
-FastAPI (Routers -> Services)
-   ↓
-SQLModel (ORM Models)
-   ↓
-SQLite (sih.db)
+Frontend (React 19 + TypeScript + Vite)
+   ↓ (REST API / HTTP JSON)
+FastAPI Backend (Routers → Services → Alert Engine)
+   ↓ (SQLModel ORM)
+SQLite Database (sih.db)
 ```
 
 ## Future Hardware Integration Architecture
-When physical hardware (ESP32) is introduced, it will communicate with the backend.
+When physical ESP32 hardware devices are deployed, telemetry flows directly into the backend:
 
 ```text
-ESP32 (Hardware)
-   ↓
-API (HTTP/MQTT)
-   ↓
-FastAPI (Backend)
-   ↓
-SQLite (Database)
-   ↓
-Dashboard (Frontend)
+ESP32 (Handheld / Wearable Probes)
+   ↓ (Wi-Fi HTTP POST /api/readings)
+FastAPI Ingestion Router
+   ↓ (Validation & Threshold Checks)
+Alert Engine Service (Deduplication & Hazard Triggers)
+   ↓ (ACID Transactions)
+SQLite Database
+   ↓ (Live Polling)
+React Dashboard (Telemetry Visualization & Instructor Alerts)
 ```
 
-**Note:** The Simulator, MQTT, Frontend, and other components are future extensions and not part of the current backend foundation.
+## Component Overview
+1. **Frontend (`/frontend`)**: React 19 single-page application built with Vite, TypeScript, Lucide React, and Recharts. Implements strict industrial design standards (light/dark modes, rectangular geometry, zero fake metrics).
+2. **Backend (`/backend`)**: FastAPI service with SQLModel ORM, Pydantic validation, alert threshold evaluation, and state machine lifecycle enforcement.
+3. **Database (`/data` or `/backend/data`)**: SQLite relational database with seed data for trainees, devices, and workshop bays.

@@ -1,0 +1,104 @@
+:root {
+  /* Color Palette - Industrial Neutral Light Mode */
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-subtle: #f8fafc;
+  --border-main: #e2e8f0;
+  --border-muted: #cbd5e1;
+  --border-focus: #0284c7;
+
+  /* Typography Colors */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  /* Primary Action Colors (Restrained Industrial Blue) */
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-active: #075985;
+  --primary-subtle: #f0f9ff;
+  --primary-border: #bae6fd;
+  --primary-text: #0369a1;
+
+  /* Semantic State: Normal / Success */
+  --state-normal-bg: #f0fdf4;
+  --state-normal-text: #15803d;
+  --state-normal-border: #bbf7d0;
+
+  /* Semantic State: Warning / Caution */
+  --state-warning-bg: #fffbeb;
+  --state-warning-text: #b45309;
+  --state-warning-border: #fde68a;
+
+  /* Semantic State: Danger / Fault / Critical */
+  --state-danger-bg: #fef2f2;
+  --state-danger-text: #b91c1c;
+  --state-danger-border: #fecaca;
+
+  /* Semantic State: Neutral / Offline */
+  --state-neutral-bg: #f1f5f9;
+  --state-neutral-text: #475569;
+  --state-neutral-border: #cbd5e1;
+
+  /* UI Dimensions & Shapes */
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 6px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+
+  /* Shadows (Flat Industrial) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] {
+  /* Color Palette - Industrial Neutral Dark Mode */
+  --bg-app: #090d16;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #1f2937;
+  --bg-subtle: #0f172a;
+  --border-main: #283548;
+  --border-muted: #374151;
+  --border-focus: #38bdf8;
+
+  /* Typography Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #0f172a;
+
+  /* Primary Action Colors */
+  --primary: #0284c7;
+  --primary-hover: #38bdf8;
+  --primary-active: #0ea5e9;
+  --primary-subtle: #082f49;
+  --primary-border: #0369a1;
+  --primary-text: #7dd3fc;
+
+  /* Semantic State: Normal / Success */
+  --state-normal-bg: #052e16;
+  --state-normal-text: #4ade80;
+  --state-normal-border: #166534;
+
+  /* Semantic State: Warning / Caution */
+  --state-warning-bg: #451a03;
+  --state-warning-text: #fbbf24;
+  --state-warning-border: #92400e;
+
+  /* Semantic State: Danger / Fault / Critical */
+  --state-danger-bg: #450a0a;
+  --state-danger-text: #f87171;
+  --state-danger-border: #991b1b;
+
+  /* Semantic State: Neutral / Offline */
+  --state-neutral-bg: #1e293b;
+  --state-neutral-text: #94a3b8;
+  --state-neutral-border: #334155;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}

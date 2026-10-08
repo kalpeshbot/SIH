@@ -1,13 +1,19 @@
-﻿# Environments
+# Environments
 .venv/
 venv/
 ENV/
 env/
 
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
 # Python
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 *.so
 .pytest_cache/
 .coverage
