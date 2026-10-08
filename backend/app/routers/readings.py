@@ -26,6 +26,14 @@ def create_reading(reading: SensorReadingCreate, session: Session = Depends(get_
     db_device = session.exec(select(Device).where(Device.device_id == reading.device_id)).first()
     if not db_device:
         raise HTTPException(status_code=400, detail="Invalid device_id: device does not exist")
+
+    # Validate device/session assignment consistency
+    if db_sess.device_id != reading.device_id:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Device '{reading.device_id}' is not assigned to session '{reading.session_id}' (assigned device is '{db_sess.device_id}')",
+        )
+
     db_device.last_seen = datetime.now(timezone.utc)
     session.add(db_device)
 

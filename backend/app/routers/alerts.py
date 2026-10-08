@@ -7,8 +7,17 @@ from app.schemas.alert import AlertCreate, AlertUpdate
 router = APIRouter(prefix="/api/alerts", tags=["Alerts"])
 
 @router.get("")
-def read_alerts(session: Session = Depends(get_session)):
-    return session.exec(select(Alert)).all()
+def read_alerts(
+    session_id: str | None = None,
+    acknowledged: bool | None = None,
+    session: Session = Depends(get_session),
+):
+    query = select(Alert)
+    if session_id is not None:
+        query = query.where(Alert.session_id == session_id)
+    if acknowledged is not None:
+        query = query.where(Alert.acknowledged == acknowledged)
+    return session.exec(query).all()
 
 @router.get("/{id}")
 def read_alert(id: int, session: Session = Depends(get_session)):
