@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 
 VALID_STATUSES = {"ONLINE", "OFFLINE", "FAULT", "UNKNOWN"}
+VALID_DEVICE_TYPES = {"WEARABLE", "HANDHELD", "MACHINE_NODE", "GATEWAY", "BEACON"}
 
 class DeviceCreate(BaseModel):
     device_id: str
@@ -18,12 +19,20 @@ class DeviceCreate(BaseModel):
             raise ValueError("Field must not be empty or whitespace")
         return v
 
+    @field_validator("device_type")
+    @classmethod
+    def device_type_must_be_valid(cls, v: str) -> str:
+        if v.upper() not in VALID_DEVICE_TYPES:
+            raise ValueError(f"device_type must be one of {VALID_DEVICE_TYPES}")
+        return v.upper()
+
     @field_validator("status")
     @classmethod
     def status_must_be_valid(cls, v: str) -> str:
         if v not in VALID_STATUSES:
             raise ValueError(f"status must be one of {VALID_STATUSES}")
         return v
+
 
 class DeviceUpdate(BaseModel):
     status: str | None = None

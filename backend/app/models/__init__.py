@@ -6,5 +6,7 @@ from app.models.device import Device
 from app.models.session import Session
 from app.models.reading import SensorReading
 from app.models.alert import Alert
+from app.models.safety_event import SafetyEvent, MachineBaseline
 
-__all__ = ["Trainee", "Zone", "Device", "Session", "SensorReading", "Alert"]
+__all__ = ["Trainee", "Zone", "Device", "Session", "SensorReading", "Alert", "SafetyEvent", "MachineBaseline"]
+

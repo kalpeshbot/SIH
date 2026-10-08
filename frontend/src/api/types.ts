@@ -1,8 +1,23 @@
-export type DeviceType = 'HANDHELD' | 'WEARABLE' | 'BEACON';
+export type DeviceType = 'HANDHELD' | 'WEARABLE' | 'MACHINE_NODE' | 'GATEWAY' | 'BEACON';
 export type DeviceStatus = 'ONLINE' | 'OFFLINE' | 'FAULT' | 'UNKNOWN';
 export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED' | 'FAULT';
 export type AlertSeverity = 'INFO' | 'WARNING' | 'DANGER' | 'CRITICAL';
 export type ReadingStatus = 'NORMAL' | 'WARNING' | 'DANGER';
+
+export type MachineOperatingState = 'IDLE' | 'STARTUP' | 'ACTIVE' | 'COOLDOWN' | 'MAINTENANCE' | 'UNKNOWN';
+export type SensorHealthState = 'OK' | 'WARMING_UP' | 'UNRELIABLE' | 'DISCONNECTED' | 'SATURATED' | 'STALE' | 'UNKNOWN';
+export type ConfidenceLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+export type SafetyEventType =
+  | 'VIBRATION_ANOMALY'
+  | 'ACOUSTIC_ANOMALY'
+  | 'GAS_ANOMALY'
+  | 'PRESSURE_ANOMALY'
+  | 'WETNESS_EVENT'
+  | 'SENSOR_FAULT'
+  | 'MULTI_SENSOR_HAZARD'
+  | 'UNKNOWN_ANOMALY';
+export type SafetyEventStatus = 'DETECTED' | 'ACKNOWLEDGED' | 'RESOLVED' | 'DISMISSED';
+
 
 export interface Trainee {
   id: number;
@@ -208,4 +223,51 @@ export interface SessionAnalytics {
   alert_stats: AlertStatistics;
   recent_alerts: Alert[];
 }
+
+export interface SafetyEvent {
+  id: number;
+  event_id: string;
+  session_id: string;
+  device_id: string;
+  zone_id?: string | null;
+  machine_id?: string | null;
+  event_type: SafetyEventType | string;
+  severity: AlertSeverity | string;
+  status: SafetyEventStatus;
+  confidence_level: ConfidenceLevel;
+  confidence_reason?: string | null;
+  triggering_sensor_types?: string | null;
+  context_state?: MachineOperatingState | string | null;
+  started_at: string;
+  ended_at?: string | null;
+  duration_seconds?: number | null;
+  acknowledged_at?: string | null;
+  resolved_at?: string | null;
+  trainer_note?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MachineBaseline {
+  id: number;
+  baseline_id: string;
+  machine_id: string;
+  sensor_type: string;
+  machine_state: MachineOperatingState | string;
+  feature_name: string;
+  baseline_value: number;
+  spread?: number | null;
+  sample_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExplainableAlert {
+  condition: string;
+  evidence: string;
+  confidence: ConfidenceLevel | string;
+  sensor_status: SensorHealthState | string;
+  recommended_action: string;
+}
+
 

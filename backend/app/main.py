@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.database.database import create_db_and_tables
-from app.routers import health, trainees, devices, zones, sessions, readings, alerts
+from app.routers import health, trainees, devices, zones, sessions, readings, alerts, events, baselines
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,3 +37,6 @@ app.include_router(zones.router)
 app.include_router(sessions.router)
 app.include_router(readings.router)
 app.include_router(alerts.router)
+app.include_router(events.router)
+app.include_router(baselines.router)
+

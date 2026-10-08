@@ -18,6 +18,8 @@ import {
   AlertCreate,
   HealthResponse,
   SessionAnalytics,
+  SafetyEvent,
+  MachineBaseline,
 } from './types';
 
 // Health
@@ -78,7 +80,6 @@ export const downloadAlertsExport = (idOrCode: string | number, format: 'csv' | 
   window.open(`/api/sessions/${idOrCode}/export/alerts?format=${format}`, '_blank');
 };
 
-
 // Readings Ingestion
 export const ingestReading = (data: SensorReadingCreate) =>
   apiClient.post<SensorReading>('/api/readings', data);
@@ -96,3 +97,50 @@ export const createAlert = (data: AlertCreate) =>
   apiClient.post<Alert>('/api/alerts', data);
 export const acknowledgeAlert = (id: number) =>
   apiClient.patch<Alert>(`/api/alerts/${id}`, { acknowledged: true });
+
+// Safety Events (Intelligence Layer)
+export const getSafetyEvents = (params?: {
+  session_id?: string;
+  device_id?: string;
+  machine_id?: string;
+  status?: string;
+  severity?: string;
+  event_type?: string;
+}) => {
+  const query = new URLSearchParams();
+  if (params?.session_id) query.append('session_id', params.session_id);
+  if (params?.device_id) query.append('device_id', params.device_id);
+  if (params?.machine_id) query.append('machine_id', params.machine_id);
+  if (params?.status) query.append('status', params.status);
+  if (params?.severity) query.append('severity', params.severity);
+  if (params?.event_type) query.append('event_type', params.event_type);
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return apiClient.get<SafetyEvent[]>(`/api/events${queryString}`);
+};
+export const getSafetyEvent = (identifier: string | number) =>
+  apiClient.get<SafetyEvent>(`/api/events/${identifier}`);
+export const acknowledgeSafetyEvent = (identifier: string | number, trainer_note?: string) =>
+  apiClient.post<SafetyEvent>(`/api/events/${identifier}/acknowledge`, { trainer_note });
+export const resolveSafetyEvent = (identifier: string | number, trainer_note?: string) =>
+  apiClient.post<SafetyEvent>(`/api/events/${identifier}/resolve`, { trainer_note });
+export const dismissSafetyEvent = (identifier: string | number) =>
+  apiClient.post<SafetyEvent>(`/api/events/${identifier}/dismiss`, {});
+
+// Machine Baselines (Intelligence Layer)
+export const getBaselines = (params?: {
+  machine_id?: string;
+  sensor_type?: string;
+  machine_state?: string;
+  feature_name?: string;
+}) => {
+  const query = new URLSearchParams();
+  if (params?.machine_id) query.append('machine_id', params.machine_id);
+  if (params?.sensor_type) query.append('sensor_type', params.sensor_type);
+  if (params?.machine_state) query.append('machine_state', params.machine_state);
+  if (params?.feature_name) query.append('feature_name', params.feature_name);
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return apiClient.get<MachineBaseline[]>(`/api/baselines${queryString}`);
+};
+export const getMachineBaselines = (machineId: string) =>
+  apiClient.get<MachineBaseline[]>(`/api/baselines/${machineId}`);
+

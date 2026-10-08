@@ -4,6 +4,16 @@ from app.schemas.device import DeviceCreate, DeviceUpdate
 from app.schemas.session import SessionCreate, SessionUpdate
 from app.schemas.reading import SensorReadingCreate
 from app.schemas.alert import AlertCreate, AlertUpdate
+from app.schemas.intelligence import (
+    SafetyEventCreate,
+    SafetyEventRead,
+    SafetyEventAcknowledge,
+    SafetyEventResolve,
+    MachineBaselineCreate,
+    MachineBaselineRead,
+    ExplainableAlertContract,
+    SignalFeaturesContract
+)
 
 __all__ = [
     "TraineeCreate", "TraineeUpdate",
@@ -11,5 +21,10 @@ __all__ = [
     "DeviceCreate", "DeviceUpdate",
     "SessionCreate", "SessionUpdate",
     "SensorReadingCreate",
-    "AlertCreate", "AlertUpdate"
+    "AlertCreate", "AlertUpdate",
+    "SafetyEventCreate", "SafetyEventRead",
+    "SafetyEventAcknowledge", "SafetyEventResolve",
+    "MachineBaselineCreate", "MachineBaselineRead",
+    "ExplainableAlertContract", "SignalFeaturesContract"
 ]
+

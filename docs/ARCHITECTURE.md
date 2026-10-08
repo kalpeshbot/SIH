@@ -27,6 +27,8 @@ React Dashboard (Telemetry Visualization & Instructor Alerts)
 ```
 
 ## Component Overview
-1. **Frontend (`/frontend`)**: React 19 single-page application built with Vite, TypeScript, Lucide React, and Recharts. Implements strict industrial design standards (light/dark modes, rectangular geometry, zero fake metrics).
-2. **Backend (`/backend`)**: FastAPI service with SQLModel ORM, Pydantic validation, alert threshold evaluation, and state machine lifecycle enforcement.
-3. **Database (`/data` or `/backend/data`)**: SQLite relational database with seed data for trainees, devices, and workshop bays.
+1. **Frontend (`/frontend`)**: React 19 single-page application built with Vite, TypeScript, Lucide React, and Recharts. Implements dual portals (Trainer Console and Trainee Portal).
+2. **Backend (`/backend`)**: FastAPI service with SQLModel ORM, Pydantic validation, alert deduplication, safety event lifecycle management, and machine baseline tracking.
+3. **Intelligence Layer (`/docs/MORD_INTELLIGENCE.md`)**: Context-aware machine anomaly detection, sensor health validation, explainable alert generation, and post-session debrief event reconstruction.
+4. **Database (`/data` or `/backend/data`)**: SQLite relational database with full relational models for Trainees, Devices, Zones, Sessions, SensorReadings, Alerts, SafetyEvents, and MachineBaselines.
+
