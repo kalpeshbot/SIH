@@ -4,6 +4,7 @@ import { LiveMetricsBar } from '../components/dashboard/LiveMetricsBar';
 import { ActiveAlertsList } from '../components/dashboard/ActiveAlertsList';
 import { ActiveSessionsGrid } from '../components/dashboard/ActiveSessionsGrid';
 import { DeviceStatusOverview } from '../components/dashboard/DeviceStatusOverview';
+import { LiveMonitoringPanel } from '../components/dashboard/LiveMonitoringPanel';
 import { CardSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorState } from '../components/common/ErrorState';
 import { AlertDetailModal } from '../components/alerts/AlertDetailModal';
@@ -27,6 +28,7 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+  const [lastPollTime, setLastPollTime] = useState<Date | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -41,6 +43,7 @@ export const DashboardPage: React.FC = () => {
       setAlerts(alertsData);
       setTrainees(traineesData);
       setError(null);
+      setLastPollTime(new Date());
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError('Failed to retrieve operational telemetry.');
@@ -97,7 +100,7 @@ export const DashboardPage: React.FC = () => {
           </span>
         </div>
 
-        {error ? (
+        {error && !loading ? (
           <ErrorState message={error} onRetry={fetchData} />
         ) : loading ? (
           <CardSkeleton count={4} />
@@ -109,6 +112,14 @@ export const DashboardPage: React.FC = () => {
               onlineDevicesCount={onlineDevices.length}
               openAlertsCount={alerts.length}
               traineesCount={trainees.length}
+            />
+
+            {/* ─── LIVE MONITORING PANEL ─── */}
+            <LiveMonitoringPanel
+              activeSessions={activeSessions}
+              allDevices={devices}
+              lastPollTime={lastPollTime}
+              pollError={error}
             />
 
             {/* Urgent Hazards Section */}
