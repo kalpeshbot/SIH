@@ -16,13 +16,13 @@ export const Sidebar: React.FC = () => {
   const { activeAlertsCount } = useSystem();
 
   const navItems = [
-    { to: '/',         label: 'Dashboard', icon: <Activity size={15} />,      end: true },
-    { to: '/sessions', label: 'Sessions',  icon: <PlaySquare size={15} /> },
-    { to: '/trainees', label: 'Trainees',  icon: <Users size={15} /> },
-    { to: '/devices',  label: 'Devices',   icon: <Radio size={15} /> },
-    { to: '/zones',    label: 'Zones',     icon: <MapPin size={15} /> },
+    { to: '/trainer',         label: 'Dashboard', icon: <Activity size={15} />,      end: true },
+    { to: '/trainer/sessions', label: 'Sessions',  icon: <PlaySquare size={15} /> },
+    { to: '/trainer/trainees', label: 'Trainees',  icon: <Users size={15} /> },
+    { to: '/trainer/devices',  label: 'Devices',   icon: <Radio size={15} /> },
+    { to: '/trainer/zones',    label: 'Zones',     icon: <MapPin size={15} /> },
     {
-      to: '/alerts',
+      to: '/trainer/alerts',
       label: 'Alerts',
       icon: <AlertTriangle size={15} />,
       badge: activeAlertsCount > 0 ? activeAlertsCount : null,
@@ -148,7 +148,7 @@ export const Sidebar: React.FC = () => {
         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
           <li>
             <NavLink
-              to="/settings"
+              to="/trainer/settings"
               style={({ isActive }) => linkStyle(isActive)}
             >
               <Settings size={15} />
@@ -172,13 +172,19 @@ export const Sidebar: React.FC = () => {
             color: 'var(--text-muted)',
             marginBottom: '0.4rem',
             lineHeight: 1.4,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          Vocational Safety Prototype
+          <span>Trainer Console</span>
+          <NavLink to="/" style={{ color: 'var(--primary-text)', textDecoration: 'none', fontWeight: 600 }}>
+            Switch
+          </NavLink>
         </div>
         <div style={{ display: 'flex', gap: '0.6rem' }}>
           <NavLink
-            to="/privacy"
+            to="/trainer/privacy"
             style={{
               color: 'var(--text-muted)',
               textDecoration: 'none',
@@ -193,7 +199,7 @@ export const Sidebar: React.FC = () => {
           </NavLink>
           <span style={{ color: 'var(--border-muted)', fontSize: '0.7rem' }}>|</span>
           <NavLink
-            to="/terms"
+            to="/trainer/terms"
             style={{
               color: 'var(--text-muted)',
               textDecoration: 'none',
