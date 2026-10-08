@@ -8,7 +8,6 @@ import {
   MapPin,
   AlertTriangle,
   Settings,
-  Shield,
   FileText,
 } from 'lucide-react';
 import { useSystem } from '../../context/SystemContext';
@@ -68,43 +67,18 @@ export const Sidebar: React.FC = () => {
           borderBottom: '1px solid var(--border-muted)',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.6rem',
         }}
       >
         <div
           style={{
-            backgroundColor: 'var(--primary)',
-            color: '#fff',
-            padding: '0.35rem',
-            borderRadius: 'var(--radius-sm)',
-            display: 'flex',
-            flexShrink: 0,
+            fontWeight: 700,
+            fontSize: '0.825rem',
+            color: 'var(--text-primary)',
+            letterSpacing: '0.05em',
+            lineHeight: 1.2,
           }}
         >
-          <Shield size={16} />
-        </div>
-        <div>
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: '0.825rem',
-              color: 'var(--text-primary)',
-              letterSpacing: '-0.01em',
-              lineHeight: 1.2,
-            }}
-          >
-            SIH Safety Monitor
-          </div>
-          <div
-            style={{
-              fontSize: '0.65rem',
-              color: 'var(--text-muted)',
-              fontFamily: 'var(--font-mono)',
-              marginTop: '1px',
-            }}
-          >
-            PROTOTYPE v0.1.0
-          </div>
+          MORD
         </div>
       </div>
 
