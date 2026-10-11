@@ -624,8 +624,12 @@ export const InspectionDetailPage: React.FC = () => {
                       </div>
                       <p style={{ color: 'var(--text-secondary)', margin: '0 0 0.3rem' }}>{inv.notes}</p>
                       {inv.comparison_notes && (
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                          Comparison: {inv.comparison_notes}
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          <span style={{ fontWeight: 600 }}>Observed Window Metric Diff: </span>
+                          <span>{inv.comparison_notes}</span>
+                          <span style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '2px' }}>
+                            * Statistical difference between sample windows; does not prove sole causal attribution.
+                          </span>
                         </div>
                       )}
                     </div>

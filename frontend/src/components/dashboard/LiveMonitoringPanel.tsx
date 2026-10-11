@@ -228,6 +228,7 @@ export const LiveMonitoringPanel: React.FC<LiveMonitoringPanelProps> = ({
             }}
           >
             <span
+              className={liveState === 'LIVE' ? 'glow-live' : ''}
               style={{
                 width: '8px',
                 height: '8px',

@@ -29,8 +29,8 @@ export const ActiveSessionsGrid: React.FC<ActiveSessionsGridProps> = ({ sessions
         gap: '1rem',
       }}
     >
-      {activeSessions.map((session) => (
-        <div key={session.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+      {activeSessions.map((session, idx) => (
+        <div key={session.id} className="card fade-in" style={{ display: 'flex', flexDirection: 'column', animationDelay: `${idx * 60}ms` }}>
           <div className="card-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <PlaySquare size={16} color="var(--primary)" />

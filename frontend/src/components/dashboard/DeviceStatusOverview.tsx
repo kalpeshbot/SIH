@@ -17,7 +17,7 @@ export const DeviceStatusOverview: React.FC<DeviceStatusOverviewProps> = ({ devi
   }
 
   return (
-    <div className="table-container">
+    <div className="table-container fade-in">
       <table className="data-table">
         <thead>
           <tr>
@@ -33,7 +33,7 @@ export const DeviceStatusOverview: React.FC<DeviceStatusOverviewProps> = ({ devi
             <tr key={device.id}>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
-                  <Radio size={14} color="var(--text-secondary)" />
+                  <Radio size={14} color="var(--primary)" />
                   {device.device_id}
                 </div>
               </td>
@@ -41,15 +41,21 @@ export const DeviceStatusOverview: React.FC<DeviceStatusOverviewProps> = ({ devi
               <td>
                 <StatusBadge status={device.status} />
               </td>
-              <td>{device.zone_id || 'Unassigned'}</td>
+              <td>
+                {device.zone_id ? (
+                  <span className="mono" style={{ fontSize: '0.85rem' }}>{device.zone_id}</span>
+                ) : (
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Unassigned</span>
+                )}
+              </td>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                  {device.battery > 90 ? (
+                  {device.battery != null && device.battery > 90 ? (
                     <BatteryCharging size={14} color="var(--state-normal-text)" />
                   ) : (
-                    <Battery size={14} color={device.battery < 20 ? 'var(--state-danger-text)' : 'var(--text-secondary)'} />
+                    <Battery size={14} color={device.battery != null && device.battery < 20 ? 'var(--state-danger-text)' : 'var(--text-secondary)'} />
                   )}
-                  <span>{device.battery}%</span>
+                  <span>{device.battery != null ? `${device.battery}%` : '--'}</span>
                 </div>
               </td>
             </tr>
@@ -59,3 +65,4 @@ export const DeviceStatusOverview: React.FC<DeviceStatusOverviewProps> = ({ devi
     </div>
   );
 };
+

@@ -69,19 +69,27 @@ export const Sidebar: React.FC = () => {
           padding: '0.875rem 0.875rem 0.75rem',
           borderBottom: '1px solid var(--border-muted)',
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: 'column',
+          gap: '0.2rem',
         }}
       >
         <div
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
             fontWeight: 700,
-            fontSize: '0.825rem',
+            fontSize: '0.9rem',
             color: 'var(--text-primary)',
-            letterSpacing: '0.05em',
+            letterSpacing: '0.04em',
             lineHeight: 1.2,
           }}
         >
-          MORD
+          <span style={{ color: 'var(--primary-text)' }}>MORD</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>WORKBENCH</span>
+        </div>
+        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+          Industrial Safety & Training
         </div>
       </div>
 

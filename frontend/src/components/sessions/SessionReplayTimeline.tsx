@@ -167,10 +167,35 @@ export const SessionReplayTimeline: React.FC<SessionReplayTimelineProps> = ({ se
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.15rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
                     <span style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
                       {rec.title}
                     </span>
+                    {rec.record_type === 'SAFETY_EVENT' && (
+                      <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>
+                        DERIVED ANOMALY
+                      </span>
+                    )}
+                    {rec.record_type === 'ALERT' && (
+                      <span className="badge badge-warning" style={{ fontSize: '0.65rem' }}>
+                        OBSERVED ALERT
+                      </span>
+                    )}
+                    {rec.record_type === 'INSPECTION' && (
+                      <span className="badge badge-normal" style={{ fontSize: '0.65rem' }}>
+                        TRAINER DECISION
+                      </span>
+                    )}
+                    {rec.record_type === 'INTERVENTION' && (
+                      <span className="badge badge-normal" style={{ fontSize: '0.65rem' }}>
+                        TRAINER ACTION
+                      </span>
+                    )}
+                    {rec.record_type === 'SESSION_LIFECYCLE' && (
+                      <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>
+                        LIFECYCLE
+                      </span>
+                    )}
                     <StatusBadge status={rec.status} />
                     {rec.machine_id && (
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>

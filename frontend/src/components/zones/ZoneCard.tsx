@@ -38,7 +38,7 @@ export const ZoneCard: React.FC<ZoneCardProps> = ({
 
   return (
     <div
-      className="card"
+      className="card fade-in"
       style={{
         borderColor: stateBorder,
         display: 'flex',

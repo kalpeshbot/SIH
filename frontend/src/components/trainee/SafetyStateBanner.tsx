@@ -135,6 +135,7 @@ export const SafetyStateBanner: React.FC<SafetyStateBannerProps> = ({
             {config.title}
           </h2>
           <span
+            className={state === 'DANGER' || state === 'WARNING' || state === 'NORMAL' ? 'pulse-dot' : ''}
             style={{
               width: '10px',
               height: '10px',
