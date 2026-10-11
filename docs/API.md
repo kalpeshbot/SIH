@@ -220,3 +220,85 @@
 - **Purpose**: Acknowledge an alert.
 - **Request Body**: `{"acknowledged": true}`
 - **Response**: `200 OK` `AlertRead` | `404 Not Found`
+
+---
+
+## Evidence-Guided Inspections (`/api/inspections`)
+
+### `GET /api/inspections/templates`
+- **Purpose**: List standard reusable walk-around inspection route templates (`LATHE_MECHANICAL_INSPECTION`, `PUMP_PIPE_INSPECTION`, `GENERAL_WORKSHOP_INSPECTION`).
+- **Response**: `200 OK` `[InspectionTemplateRead]`
+
+### `GET /api/inspections`
+- **Purpose**: List inspections with optional filters (`session_id`, `machine_id`, `zone_id`, `status`, `decision`, `limit`, `offset`).
+- **Response**: `200 OK` `[InspectionRead]`
+
+### `POST /api/inspections`
+- **Purpose**: Create a new inspection record from template or manual route.
+- **Request Body**: `InspectionCreate` (includes `inspection_id`, `session_id`, `template_id`, `reason`, `machine_id`, `trainer_notes`)
+- **Response**: `201 Created` `InspectionRead` | `400 Bad Request` | `409 Conflict`
+
+### `GET /api/inspections/{id}`
+- **Purpose**: Retrieve inspection detail including ordered checklist and evidence items.
+- **Response**: `200 OK` `InspectionRead` | `404 Not Found`
+
+### `PATCH /api/inspections/{id}/steps/{step_id}`
+- **Purpose**: Update an individual checklist step status (`PENDING`, `COMPLETED`, `SKIPPED`, `FOLLOW_UP_REQUIRED`) and observation.
+- **Response**: `200 OK` `InspectionRead` | `400 Bad Request` | `404 Not Found`
+
+### `POST /api/inspections/{id}/evidence`
+- **Purpose**: Record a structured manual or telemetry evidence observation.
+- **Request Body**: `InspectionEvidenceCreate` (`evidence_id`, `evidence_type`, `source`, `value`, `unit`, `notes`)
+- **Response**: `201 Created` `InspectionEvidenceRead` | `409 Conflict` | `422 Unprocessable Entity`
+
+### `POST /api/inspections/{id}/complete`
+- **Purpose**: Conclude an inspection by recording the trainer's final decision (`CONFIRMED_BY_TRAINER`, `REFUTED_BY_TRAINER`, `INCONCLUSIVE`, `INSUFFICIENT_EVIDENCE`).
+- **Request Body**: `InspectionComplete` (`decision`, `outcome_notes`, `trainer_notes`)
+- **Response**: `200 OK` `InspectionRead` | `400 Bad Request`
+
+### `POST /api/inspections/{id}/cancel`
+- **Purpose**: Cancel an active inspection.
+- **Response**: `200 OK` `InspectionRead` | `400 Bad Request`
+
+### `GET /api/inspections/{id}/evidence-quality`
+- **Purpose**: Deterministically evaluate evidence quality for this inspection (`SUFFICIENT`, `DEGRADED`, `INSUFFICIENT`).
+- **Response**: `200 OK` `EvidenceQualityAssessmentResponse`
+
+### `GET /api/inspections/{id}/export`
+- **Purpose**: Export inspection package in structured JSON or spreadsheet-safe CSV (`format=json` or `format=csv`).
+- **Security**: CSV formula injection characters (`=`, `+`, `-`, `@`, `\t`, `\r`, `\n`) are neutralized dynamically without modifying database records.
+- **Response**: `200 OK` `application/json` or `text/csv`
+
+---
+
+## Trainer Corrective Interventions (`/api/interventions`)
+
+### `GET /api/interventions`
+- **Purpose**: List recorded trainer interventions with filters (`session_id`, `inspection_id`, `category`, `outcome`).
+- **Response**: `200 OK` `[TrainerInterventionRead]`
+
+### `POST /api/interventions`
+- **Purpose**: Record an intervention and compute deterministic pre- and post-intervention telemetry comparison.
+- **Request Body**: `TrainerInterventionCreate` (`intervention_id`, `session_id`, `category`, `notes`, `before_window_data`, `after_window_data`)
+- **Response**: `201 Created` `TrainerInterventionRead` (includes `comparison_outcome`: `IMPROVED`, `UNCHANGED`, `WORSENED`, `INCONCLUSIVE`)
+
+---
+
+## Session Replay & Debrief Packages (`/api/sessions`)
+
+### `GET /api/sessions/{id}/replay`
+- **Purpose**: Retrieve unified chronological timeline replay of all records in a session (lifecycles, safety events, alerts, inspections, interventions).
+- **Query Parameters**: `record_type`, `machine_id`, `zone_id`, `limit`, `offset`.
+- **Response**: `200 OK` `SessionReplayResponse`
+
+### `GET /api/sessions/{id}/export/evidence-package`
+- **Purpose**: Download complete session evidence package (JSON or sanitized CSV).
+- **Response**: `200 OK` `application/json` or `text/csv`
+
+---
+
+## Trainer Intelligence Analytics (`/api/trainer`)
+
+### `GET /api/trainer/analytics`
+- **Purpose**: Aggregate evidence-backed workshop intelligence metrics: unresolved inspections, repeated events by machine and zone, response latencies (mean time to acknowledge, mean time to resolve), and skipped steps count.
+- **Response**: `200 OK` `TrainerIntelligenceAnalytics`

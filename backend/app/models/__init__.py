@@ -7,6 +7,9 @@ from app.models.session import Session
 from app.models.reading import SensorReading
 from app.models.alert import Alert
 from app.models.safety_event import SafetyEvent, MachineBaseline
+from app.models.inspection import Inspection, InspectionEvidence, TrainerIntervention
 
-__all__ = ["Trainee", "Zone", "Device", "Session", "SensorReading", "Alert", "SafetyEvent", "MachineBaseline"]
-
+__all__ = [
+    "Trainee", "Zone", "Device", "Session", "SensorReading", "Alert",
+    "SafetyEvent", "MachineBaseline", "Inspection", "InspectionEvidence", "TrainerIntervention"
+]

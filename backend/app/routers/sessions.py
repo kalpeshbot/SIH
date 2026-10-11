@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session, select
 from datetime import datetime, timezone
+from typing import Optional
+
 from app.database.database import get_session
 from app.models.session import Session as DBSession
 from app.models.trainee import Trainee
@@ -16,7 +18,11 @@ from app.services.export_service import (
     export_session_csv,
     export_readings_csv,
     export_alerts_csv,
+    export_session_evidence_package_json,
+    export_session_evidence_package_csv,
 )
+from app.services.session_replay_service import get_session_replay_timeline
+
 
 router = APIRouter(prefix="/api/sessions", tags=["Sessions"])
 
@@ -251,6 +257,65 @@ def export_session_alerts_endpoint(identifier: str, format: str = "csv", session
             headers={
                 "Content-Disposition": f'attachment; filename="alerts_{db_sess.session_id}.csv"'
             },
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Invalid export format. Supported formats: 'csv', 'json'")
+
+
+@router.get("/{identifier}/replay")
+def get_session_replay(
+    identifier: str,
+    record_type: Optional[str] = None,
+    machine_id: Optional[str] = None,
+    zone_id: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    session: Session = Depends(get_session)
+):
+    """
+    Returns a unified chronological timeline replay for the session.
+    Combines session lifecycles, safety events, alerts, inspections, and interventions.
+    """
+    db_sess = _get_session_by_identifier(identifier, session)
+    return get_session_replay_timeline(
+        session_id=db_sess.session_id,
+        db=session,
+        record_type=record_type,
+        machine_id=machine_id,
+        zone_id=zone_id,
+        limit=limit,
+        offset=offset
+    )
+
+
+@router.get("/{identifier}/export/evidence-package")
+def export_session_evidence_package_endpoint(
+    identifier: str,
+    format: str = "json",
+    session: Session = Depends(get_session)
+):
+    """
+    Generates a complete debrief evidence package (Inspections, Events, Interventions, Alerts).
+    Available as structured JSON or formula-injection-neutralized CSV.
+    """
+    db_sess = _get_session_by_identifier(identifier, session)
+    fmt = format.lower().strip()
+    if fmt == "json":
+        data = export_session_evidence_package_json(db_sess.session_id, session)
+        return JSONResponse(
+            content=data,
+            headers={
+                "Content-Disposition": f'attachment; filename="evidence_package_{db_sess.session_id}.json"'
+            }
+        )
+    elif fmt == "csv":
+        csv_str = export_session_evidence_package_csv(db_sess.session_id, session)
+        return Response(
+            content=csv_str,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f'attachment; filename="evidence_package_{db_sess.session_id}.csv"'
+            }
         )
     else:
         raise HTTPException(status_code=400, detail="Invalid export format. Supported formats: 'csv', 'json'")

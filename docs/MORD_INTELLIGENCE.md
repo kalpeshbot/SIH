@@ -192,8 +192,95 @@ In industrial workshop environments, external WAN/Internet connections are unrel
 ---
 
 ## 14. Phase 14 Hardware Integration Plan Prerequisites
-With the intelligence software architecture verified, Phase 14 will proceed with physical sensor integration:
+With the intelligence software architecture verified, Phase 14 proceeded with physical sensor integration:
 1. **SPI Bus Wiring**: IIS3DWB 3-axis vibration sensor connected via high-speed SPI to ESP32-S3.
 2. **True ODR Calibration**: Hardware timer DRDY interrupt calibration to eliminate clock skew between nodes.
 3. **Acoustic / Analog Input**: ADC setup for wideband acoustic and pressure transducers.
 4. **Local Feature Pipeline**: Implementation of local rolling RMS and band-pass calculations in firmware.
+
+---
+
+## 15. Phase 15B: Evidence-Guided Inspection Workflow
+MORD Phase 15B establishes a structured, trainer-led inspection workflow operable without hardware probe dependencies:
+
+### 15.1 Reusable Inspection Routes
+Standardized, ordered checklists guide trainers through mechanical walk-arounds:
+- `LATHE_MECHANICAL_INSPECTION`: Chuck & workholding, belt drive enclosure, spindle bearing housing, coolant return pan, safety guards.
+- `PUMP_PIPE_INSPECTION`: Flange gasket seals, mechanical seal gland, coupling alignment, baseplate foundation bolts, pressure taps.
+- `GENERAL_WORKSHOP_INSPECTION`: Boundary markings, fluid catch basins, cable conduits, emergency stops, warning placards.
+
+*Important Note on Landmark Positions*: Checklist reference positions describe physical machinery landmarks for checklist execution; they do not imply direct hardware sensor instrument readings at those coordinates.
+
+### 15.2 Conclusive Decision Vocabulary
+Trainer conclusions use explicit, distinct statuses that do NOT overload `SafetyEvent` lifecycle values:
+- `CONFIRMED_BY_TRAINER`: Physical inspection corroborated hazard presence.
+- `REFUTED_BY_TRAINER`: Physical inspection confirmed nominal machine condition / false alarm.
+- `INCONCLUSIVE`: Ambiguous physical evidence or conflicting indicators.
+- `INSUFFICIENT_EVIDENCE`: Critical sensor telemetry or checklist steps were omitted or unavailable.
+
+---
+
+## 16. Phase 15B: Evidence Quality Engine
+The Evidence Quality Engine evaluates whether available observations support safety decisions:
+- **`SUFFICIENT`**: Telemetry is fresh, sensor health is `OK`, machine operating state is verified, and baseline sample count meets policy requirements (>= 20 samples).
+- **`DEGRADED`**: Telemetry is available but compromised by stale readings (> 60s), sensor warm-up, unknown operating state, or baseline sample count below policy.
+- **`INSUFFICIENT`**: Telemetry missing, non-finite values detected, sensor disconnected/saturated, or required baseline absent.
+
+*Orthogonality Rule*: Evidence quality and hazard severity are orthogonal concepts. A high-severity event with poor evidence does NOT automatically become a low-severity event.
+
+---
+
+## 17. Phase 15B: State-Conditioned Baselines & Anomaly Explanations
+- Baselines are tied to specific machines and operating states (`IDLE`, `STARTUP`, `ACTIVE`, `COOLDOWN`).
+- Policy requires at least 20 steady-state samples before activating baseline anomaly comparisons.
+- Deviations report standard deviations (`SIGMA_SPREAD_EXCEEDED`) or percentage delta (`PERCENT_DEVIATION_EXCEEDED`).
+- Every anomaly report includes an explicit disclaimer: "Statistical anomaly detection, not certified automatic machinery diagnosis or safety shutdown."
+
+---
+
+## 18. Phase 15B: Hazard Persistence, Escalation & Recovery
+Event trend classification based on chronological measurements:
+- `TRANSIENT`: Isolated spike with rapid return to nominal range.
+- `PERSISTENT`: Ongoing deviation sustained across multiple observation windows.
+- `ESCALATING`: Deviation with increasing magnitude (+15% or higher) across window.
+- `RECOVERING`: Readings returning below threshold over consecutive samples under verified healthy sensor connectivity.
+- `UNKNOWN`: Insufficient readings or communication dropout.
+
+*Critical Scientific Rules*:
+- Missing sensor telemetry is NEVER interpreted as recovery.
+- Sensor disconnection is NEVER interpreted as recovery.
+
+---
+
+## 19. Phase 15B: Trainer Corrective Interventions
+Trainers record physical adjustments (e.g., `WORKHOLDING_ADJUSTMENT`, `SPEED_FEED_ADJUSTMENT`) and compare pre- and post-intervention telemetry windows:
+- `IMPROVED`: Observed feature decreased by >= 10%.
+- `UNCHANGED`: Feature varied within ±10%.
+- `WORSENED`: Feature increased by >= 10%.
+- `INCONCLUSIVE`: Incompatible units, differing features, shifting machine states, or missing data.
+
+*Attribution Disclaimer*: Outcomes are explicitly labelled as "observed before-and-after comparisons," not certified causal proofs.
+
+---
+
+## 20. Phase 15B: Session Replay & Trainer Intelligence
+- Unified chronological replay timeline collation across session lifecycles, safety events, alerts, inspections, and interventions.
+- Aggregated trainer intelligence metrics: unresolved inspection tallies, timing metrics (mean time to acknowledge, mean time to resolve), and skipped checklist steps.
+- Strictly prohibits punitive individual trainee safety scores or fabricated statistics.
+
+---
+
+## 21. Phase 15B: Maintenance Export & Spreadsheet Security
+- Comprehensive JSON and CSV export packages for inspections and session debriefs.
+- **CSV Formula Injection Defense**: Neutralizes dangerous spreadsheet formula injection characters (`=`, `+`, `-`, `@`, `\t`, `\r`, `\n`, `%`) by prefixing `'` dynamically at export time.
+- Underlying database records are preserved untouched.
+- PDF extension point documented for future headless PDF renderer integration.
+
+---
+
+## 22. Verification Status & Integrity Standards
+1. **Implemented Software**: Full FastAPI backend endpoints, models, migrations, SQLModel schema, React UI.
+2. **Unit-Tested Software**: 195 automated pytest unit tests covering all edge conditions, algorithms, and models.
+3. **Integration-Tested Software**: End-to-end API client integration, SQLite migrations, and Vite production bundle.
+4. **Hardware-Tested Behavior**: Physical IIS3DWB machine node streaming verified in Phase 14 firmware.
+5. **Unverified Hypotheses**: Ultrasonic acoustic probe driver is NOT implemented in Phase 15B and requires future hardware validation.

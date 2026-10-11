@@ -7,6 +7,7 @@ import {
   Radio,
   MapPin,
   AlertTriangle,
+  ClipboardCheck,
   Settings,
   FileText,
 } from 'lucide-react';
@@ -27,7 +28,9 @@ export const Sidebar: React.FC = () => {
       icon: <AlertTriangle size={15} />,
       badge: activeAlertsCount > 0 ? activeAlertsCount : null,
     },
+    { to: '/trainer/inspections', label: 'Inspections', icon: <ClipboardCheck size={15} /> },
   ];
+
 
   const linkStyle = (isActive: boolean): React.CSSProperties => ({
     display: 'flex',

@@ -14,6 +14,19 @@ from app.schemas.intelligence import (
     ExplainableAlertContract,
     SignalFeaturesContract
 )
+from app.schemas.inspection import (
+    InspectionCreate,
+    InspectionRead,
+    InspectionStepItem,
+    InspectionStepUpdate,
+    InspectionComplete,
+    InspectionEvidenceCreate,
+    InspectionEvidenceRead,
+    TrainerInterventionCreate,
+    TrainerInterventionRead,
+    EvidenceQualityAssessmentResponse,
+    InspectionTemplateRead
+)
 
 __all__ = [
     "TraineeCreate", "TraineeUpdate",
@@ -25,6 +38,11 @@ __all__ = [
     "SafetyEventCreate", "SafetyEventRead",
     "SafetyEventAcknowledge", "SafetyEventResolve",
     "MachineBaselineCreate", "MachineBaselineRead",
-    "ExplainableAlertContract", "SignalFeaturesContract"
+    "ExplainableAlertContract", "SignalFeaturesContract",
+    "InspectionCreate", "InspectionRead",
+    "InspectionStepItem", "InspectionStepUpdate",
+    "InspectionComplete", "InspectionEvidenceCreate",
+    "InspectionEvidenceRead", "TrainerInterventionCreate",
+    "TrainerInterventionRead", "EvidenceQualityAssessmentResponse",
+    "InspectionTemplateRead"
 ]
-

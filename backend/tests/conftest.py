@@ -32,3 +32,8 @@ def client_fixture():
     # Restore original engine
     database.engine = original_engine
 
+
+@pytest.fixture(name="session")
+def session_fixture():
+    with Session(engine) as session:
+        yield session

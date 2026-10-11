@@ -7,6 +7,7 @@ import { ErrorState } from '../components/common/ErrorState';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { SensorChart } from '../components/sessions/SensorChart';
 import { SessionTimeline } from '../components/sessions/SessionTimeline';
+import { SessionReplayTimeline } from '../components/sessions/SessionReplayTimeline';
 import { SessionAnalyticsCard } from '../components/sessions/SessionAnalyticsCard';
 import { SessionReportModal } from '../components/sessions/SessionReportModal';
 import { ActiveAlertsList } from '../components/dashboard/ActiveAlertsList';
@@ -360,6 +361,9 @@ export const SessionDetailPage: React.FC = () => {
           readings={readings}
           alerts={alerts}
         />
+
+        {/* Phase 15B: Unified Chronological Replay Timeline & Maintenance Debrief Package */}
+        <SessionReplayTimeline sessionId={session.session_id} />
       </div>
 
       {/* Trainer Printable Session Report Modal */}

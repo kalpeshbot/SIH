@@ -270,4 +270,218 @@ export interface ExplainableAlert {
   recommended_action: string;
 }
 
+// Phase 15B: Evidence-Guided Inspection & Intelligence Layer
+export type InspectionDecision =
+  | 'CONFIRMED_BY_TRAINER'
+  | 'REFUTED_BY_TRAINER'
+  | 'INCONCLUSIVE'
+  | 'INSUFFICIENT_EVIDENCE';
 
+export type InspectionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export type StepStatus = 'PENDING' | 'COMPLETED' | 'SKIPPED' | 'FOLLOW_UP_REQUIRED';
+
+export type EvidenceQualityStatus = 'SUFFICIENT' | 'DEGRADED' | 'INSUFFICIENT';
+
+export type InterventionOutcome = 'IMPROVED' | 'UNCHANGED' | 'WORSENED' | 'INCONCLUSIVE';
+
+export type TrendState = 'TRANSIENT' | 'PERSISTENT' | 'ESCALATING' | 'RECOVERING' | 'UNKNOWN';
+
+export interface InspectionStepItem {
+  step_id: string;
+  instruction: string;
+  component?: string | null;
+  reference_position?: string | null;
+  status: StepStatus;
+  observation?: string | null;
+  evidence_reference?: string | null;
+  completed_at?: string | null;
+}
+
+export interface InspectionTemplate {
+  template_id: string;
+  title: string;
+  category: string;
+  description: string;
+  steps: InspectionStepItem[];
+}
+
+export interface InspectionEvidence {
+  id: number;
+  evidence_id: string;
+  inspection_id: string;
+  session_id: string;
+  evidence_type: string;
+  source: string;
+  reference_id?: string | null;
+  value?: number | null;
+  unit?: string | null;
+  notes?: string | null;
+  timestamp: string;
+  created_at: string;
+}
+
+export interface InspectionEvidenceCreate {
+  evidence_id: string;
+  evidence_type: string;
+  source?: string;
+  reference_id?: string | null;
+  value?: number | null;
+  unit?: string | null;
+  notes?: string | null;
+  timestamp?: string | null;
+}
+
+export interface Inspection {
+  id: number;
+  inspection_id: string;
+  session_id: string;
+  device_id?: string | null;
+  zone_id?: string | null;
+  machine_id?: string | null;
+  event_id?: string | null;
+  trainer_id?: string | null;
+  template_id?: string | null;
+  status: InspectionStatus;
+  decision?: InspectionDecision | null;
+  reason: string;
+  checklist: InspectionStepItem[];
+  measurement_source?: string | null;
+  sensor_health_state?: string | null;
+  machine_state?: string | null;
+  baseline_id?: string | null;
+  trainer_notes?: string | null;
+  outcome_notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string | null;
+  evidence_items: InspectionEvidence[];
+}
+
+export interface InspectionCreate {
+  inspection_id: string;
+  session_id: string;
+  device_id?: string | null;
+  zone_id?: string | null;
+  machine_id?: string | null;
+  event_id?: string | null;
+  trainer_id?: string | null;
+  template_id?: string | null;
+  reason: string;
+  checklist?: InspectionStepItem[] | null;
+  measurement_source?: string;
+  sensor_health_state?: string;
+  machine_state?: string;
+  baseline_id?: string | null;
+  trainer_notes?: string | null;
+}
+
+export interface InspectionComplete {
+  decision: InspectionDecision;
+  outcome_notes?: string | null;
+  trainer_notes?: string | null;
+}
+
+export interface InspectionStepUpdate {
+  status: StepStatus;
+  observation?: string | null;
+  evidence_reference?: string | null;
+}
+
+export interface EvidenceQualityAssessment {
+  status: EvidenceQualityStatus;
+  quality_issues: string[];
+  supporting_evidence_refs: string[];
+  missing_evidence_requirements: string[];
+  explanation: string;
+  assessment_timestamp: string;
+}
+
+export interface TrainerIntervention {
+  id: number;
+  intervention_id: string;
+  session_id: string;
+  inspection_id?: string | null;
+  event_id?: string | null;
+  machine_id?: string | null;
+  trainer_id?: string | null;
+  category: string;
+  notes: string;
+  timestamp: string;
+  before_window_data?: Record<string, any> | null;
+  after_window_data?: Record<string, any> | null;
+  comparison_outcome: InterventionOutcome;
+  comparison_notes?: string | null;
+  created_at: string;
+}
+
+export interface TrainerInterventionCreate {
+  intervention_id: string;
+  session_id: string;
+  inspection_id?: string | null;
+  event_id?: string | null;
+  machine_id?: string | null;
+  trainer_id?: string | null;
+  category: string;
+  notes: string;
+  timestamp?: string | null;
+  before_window_data?: Record<string, any> | null;
+  after_window_data?: Record<string, any> | null;
+  comparison_notes?: string | null;
+}
+
+export interface TimelineRecord {
+  record_type: 'SESSION_LIFECYCLE' | 'SAFETY_EVENT' | 'ALERT' | 'INSPECTION' | 'INTERVENTION';
+  id: string;
+  timestamp: string;
+  title: string;
+  machine_id?: string | null;
+  zone_id?: string | null;
+  severity: string;
+  status: string;
+  details: Record<string, any>;
+}
+
+export interface SessionReplayResponse {
+  session_id: string;
+  total_records: number;
+  limit: number;
+  offset: number;
+  records: TimelineRecord[];
+}
+
+export interface TrainerIntelligenceAnalytics {
+  session_filter?: string | null;
+  inspections: {
+    total: number;
+    unresolved: number;
+    completed: number;
+    cancelled: number;
+    decisions: Record<string, number>;
+    checklist_steps: {
+      completed: number;
+      skipped: number;
+      follow_up_required: number;
+    };
+  };
+  safety_events: {
+    total: number;
+    by_type: Record<string, number>;
+    by_trend: Record<string, number>;
+    repeated_by_machine: Record<string, number>;
+    repeated_by_zone: Record<string, number>;
+    timing_metrics: {
+      average_time_to_acknowledge_seconds: number | null;
+      acknowledged_samples_count: number;
+      unacknowledged_or_missing_samples: number;
+      average_time_to_resolve_seconds: number | null;
+      resolved_samples_count: number;
+      unresolved_or_missing_samples: number;
+    };
+  };
+  interventions: {
+    total: number;
+    outcomes: Record<string, number>;
+    categories: Record<string, number>;
+  };
+}

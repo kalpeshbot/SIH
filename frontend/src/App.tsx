@@ -16,6 +16,8 @@ import { TraineesPage } from './pages/TraineesPage';
 import { DevicesPage } from './pages/DevicesPage';
 import { ZonesPage } from './pages/ZonesPage';
 import { AlertsPage } from './pages/AlertsPage';
+import { InspectionsPage } from './pages/InspectionsPage';
+import { InspectionDetailPage } from './pages/InspectionDetailPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
@@ -49,6 +51,8 @@ export const App: React.FC = () => {
               <Route path="devices" element={<DevicesPage />} />
               <Route path="zones" element={<ZonesPage />} />
               <Route path="alerts" element={<AlertsPage />} />
+              <Route path="inspections" element={<InspectionsPage />} />
+              <Route path="inspections/:id" element={<InspectionDetailPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="privacy" element={<PrivacyPage />} />
               <Route path="terms" element={<TermsPage />} />
@@ -61,6 +65,7 @@ export const App: React.FC = () => {
             <Route path="/devices" element={<Navigate to="/trainer/devices" replace />} />
             <Route path="/zones" element={<Navigate to="/trainer/zones" replace />} />
             <Route path="/alerts" element={<Navigate to="/trainer/alerts" replace />} />
+            <Route path="/inspections" element={<Navigate to="/trainer/inspections" replace />} />
             <Route path="/settings" element={<Navigate to="/trainer/settings" replace />} />
             <Route path="/privacy" element={<Navigate to="/trainer/privacy" replace />} />
             <Route path="/terms" element={<Navigate to="/trainer/terms" replace />} />

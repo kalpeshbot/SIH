@@ -10,15 +10,16 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className = ''
 
   let variantClass = 'badge-neutral';
 
-  if (['ONLINE', 'ACTIVE', 'NORMAL', 'CONNECTED', 'PASS'].includes(norm)) {
+  if (['ONLINE', 'ACTIVE', 'NORMAL', 'CONNECTED', 'PASS', 'SUFFICIENT', 'IMPROVED', 'RECOVERING', 'REFUTED_BY_TRAINER'].includes(norm)) {
     variantClass = 'badge-normal';
-  } else if (['WARNING', 'PAUSED'].includes(norm)) {
+  } else if (['WARNING', 'PAUSED', 'DEGRADED', 'INCONCLUSIVE', 'PERSISTENT', 'FOLLOW_UP_REQUIRED'].includes(norm)) {
     variantClass = 'badge-warning';
-  } else if (['OFFLINE', 'FAULT', 'DANGER', 'CRITICAL', 'CANCELLED', 'FAIL'].includes(norm)) {
+  } else if (['OFFLINE', 'FAULT', 'DANGER', 'CRITICAL', 'CANCELLED', 'FAIL', 'INSUFFICIENT', 'INSUFFICIENT_EVIDENCE', 'ESCALATING', 'WORSENED'].includes(norm)) {
     variantClass = 'badge-danger';
-  } else if (['COMPLETED', 'INFO'].includes(norm)) {
+  } else if (['COMPLETED', 'INFO', 'TRANSIENT', 'UNCHANGED', 'CONFIRMED_BY_TRAINER'].includes(norm)) {
     variantClass = 'badge-info';
   }
+
 
   return (
     <span className={`badge ${variantClass} ${className}`}>

@@ -24,6 +24,9 @@ class SafetyEvent(SQLModel, table=True):
     acknowledged_at: Optional[datetime] = None
     resolved_at: Optional[datetime] = None
     trainer_note: Optional[str] = None
+    trend_state: Optional[str] = None # TRANSIENT, PERSISTENT, ESCALATING, RECOVERING, UNKNOWN
+    trend_reason: Optional[str] = None
+    persistence_count: Optional[int] = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -40,5 +43,9 @@ class MachineBaseline(SQLModel, table=True):
     baseline_value: float
     spread: Optional[float] = None # e.g. MAD or standard deviation
     sample_count: int = 0
+    version: int = 1
+    validity_state: str = "VALID" # VALID, INSUFFICIENT_SAMPLES, STALE, INVALIDATED
+    capture_period_seconds: Optional[float] = None
+    source: Optional[str] = "CALIBRATION_RUN"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

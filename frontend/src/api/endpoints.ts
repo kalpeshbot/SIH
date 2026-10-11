@@ -20,6 +20,18 @@ import {
   SessionAnalytics,
   SafetyEvent,
   MachineBaseline,
+  Inspection,
+  InspectionCreate,
+  InspectionComplete,
+  InspectionStepUpdate,
+  InspectionEvidence,
+  InspectionEvidenceCreate,
+  InspectionTemplate,
+  EvidenceQualityAssessment,
+  TrainerIntervention,
+  TrainerInterventionCreate,
+  SessionReplayResponse,
+  TrainerIntelligenceAnalytics,
 } from './types';
 
 // Health
@@ -144,3 +156,143 @@ export const getBaselines = (params?: {
 export const getMachineBaselines = (machineId: string) =>
   apiClient.get<MachineBaseline[]>(`/api/baselines/${machineId}`);
 
+// =========================================================================
+// Phase 15B: Evidence-Guided Inspection Endpoints
+// =========================================================================
+
+export const getInspectionTemplates = () =>
+  apiClient.get<InspectionTemplate[]>('/api/inspections/templates');
+
+export const getInspectionTemplate = (templateId: string) =>
+  apiClient.get<InspectionTemplate>(`/api/inspections/templates/${templateId}`);
+
+export const getInspections = (params?: {
+  session_id?: string;
+  machine_id?: string;
+  zone_id?: string;
+  event_id?: string;
+  status?: string;
+  decision?: string;
+  limit?: number;
+  offset?: number;
+}) => {
+  const query = new URLSearchParams();
+  if (params?.session_id) query.append('session_id', params.session_id);
+  if (params?.machine_id) query.append('machine_id', params.machine_id);
+  if (params?.zone_id) query.append('zone_id', params.zone_id);
+  if (params?.event_id) query.append('event_id', params.event_id);
+  if (params?.status) query.append('status', params.status);
+  if (params?.decision) query.append('decision', params.decision);
+  if (params?.limit !== undefined) query.append('limit', String(params.limit));
+  if (params?.offset !== undefined) query.append('offset', String(params.offset));
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return apiClient.get<Inspection[]>(`/api/inspections${queryString}`);
+};
+
+export const getInspection = (identifier: string | number) =>
+  apiClient.get<Inspection>(`/api/inspections/${identifier}`);
+
+export const createInspection = (data: InspectionCreate) =>
+  apiClient.post<Inspection>('/api/inspections', data);
+
+export const updateInspectionStep = (
+  identifier: string | number,
+  stepId: string,
+  data: InspectionStepUpdate
+) =>
+  apiClient.patch<Inspection>(`/api/inspections/${identifier}/steps/${stepId}`, data);
+
+export const addInspectionEvidence = (
+  identifier: string | number,
+  data: InspectionEvidenceCreate
+) =>
+  apiClient.post<InspectionEvidence>(`/api/inspections/${identifier}/evidence`, data);
+
+export const completeInspection = (
+  identifier: string | number,
+  data: InspectionComplete
+) =>
+  apiClient.post<Inspection>(`/api/inspections/${identifier}/complete`, data);
+
+export const cancelInspection = (
+  identifier: string | number,
+  cancellationNotes?: string
+) => {
+  const query = cancellationNotes
+    ? `?cancellation_notes=${encodeURIComponent(cancellationNotes)}`
+    : '';
+  return apiClient.post<Inspection>(`/api/inspections/${identifier}/cancel${query}`, {});
+};
+
+export const getInspectionEvidenceQuality = (identifier: string | number) =>
+  apiClient.get<EvidenceQualityAssessment>(`/api/inspections/${identifier}/evidence-quality`);
+
+export const downloadInspectionExport = (
+  identifier: string | number,
+  format: 'json' | 'csv' = 'json'
+) => {
+  window.open(`/api/inspections/${identifier}/export?format=${format}`, '_blank');
+};
+
+// =========================================================================
+// Phase 15B: Trainer Interventions Endpoints
+// =========================================================================
+
+export const getInterventions = (params?: {
+  session_id?: string;
+  inspection_id?: string;
+  event_id?: string;
+  category?: string;
+  outcome?: string;
+}) => {
+  const query = new URLSearchParams();
+  if (params?.session_id) query.append('session_id', params.session_id);
+  if (params?.inspection_id) query.append('inspection_id', params.inspection_id);
+  if (params?.event_id) query.append('event_id', params.event_id);
+  if (params?.category) query.append('category', params.category);
+  if (params?.outcome) query.append('outcome', params.outcome);
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return apiClient.get<TrainerIntervention[]>(`/api/interventions${queryString}`);
+};
+
+export const getIntervention = (identifier: string | number) =>
+  apiClient.get<TrainerIntervention>(`/api/interventions/${identifier}`);
+
+export const createIntervention = (data: TrainerInterventionCreate) =>
+  apiClient.post<TrainerIntervention>('/api/interventions', data);
+
+// =========================================================================
+// Phase 15B: Session Replay & Trainer Intelligence
+// =========================================================================
+
+export const getSessionReplay = (
+  sessionId: string | number,
+  params?: {
+    record_type?: string;
+    machine_id?: string;
+    zone_id?: string;
+    limit?: number;
+    offset?: number;
+  }
+) => {
+  const query = new URLSearchParams();
+  if (params?.record_type) query.append('record_type', params.record_type);
+  if (params?.machine_id) query.append('machine_id', params.machine_id);
+  if (params?.zone_id) query.append('zone_id', params.zone_id);
+  if (params?.limit !== undefined) query.append('limit', String(params.limit));
+  if (params?.offset !== undefined) query.append('offset', String(params.offset));
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return apiClient.get<SessionReplayResponse>(`/api/sessions/${sessionId}/replay${queryString}`);
+};
+
+export const downloadSessionEvidencePackage = (
+  sessionId: string | number,
+  format: 'json' | 'csv' = 'json'
+) => {
+  window.open(`/api/sessions/${sessionId}/export/evidence-package?format=${format}`, '_blank');
+};
+
+export const getTrainerAnalytics = (sessionId?: string) => {
+  const query = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : '';
+  return apiClient.get<TrainerIntelligenceAnalytics>(`/api/trainer/analytics${query}`);
+};
